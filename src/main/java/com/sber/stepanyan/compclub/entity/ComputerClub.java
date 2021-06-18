@@ -12,7 +12,7 @@ public class ComputerClub {
 
     private String address;
     private String name;
-    private int computer_count;
+
 
     @OneToMany(mappedBy = "computerClub")
     private List<Workstation> workstations;
@@ -51,13 +51,6 @@ public class ComputerClub {
         this.name = name;
     }
 
-    public int getComputer_count() {
-        return computer_count;
-    }
-
-    public void setComputer_count(int computer_count) {
-        this.computer_count = computer_count;
-    }
 
     public List<Workstation> getComputers() {
         return workstations;
@@ -75,7 +68,6 @@ public class ComputerClub {
         ComputerClub that = (ComputerClub) o;
 
         if (id != that.id) return false;
-        if (computer_count != that.computer_count) return false;
         if (address != null ? !address.equals(that.address) : that.address != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         return workstations != null ? workstations.equals(that.workstations) : that.workstations == null;
@@ -86,7 +78,6 @@ public class ComputerClub {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (address != null ? address.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + computer_count;
         result = 31 * result + (workstations != null ? workstations.hashCode() : 0);
         return result;
     }

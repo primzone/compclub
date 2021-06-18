@@ -33,7 +33,7 @@ public class ComputerClubController {
     }
 
 
-    @PostMapping("/computerclub")
+    @PostMapping("/computerclub")// добавить рабочую станцию клубу
     public MyResponse addComputerClub(@RequestBody ComputerClub computerClub){
 
         computerClubService.addComputerClub(computerClub);
@@ -41,14 +41,11 @@ public class ComputerClubController {
 
     }
 
-    @GetMapping("/computerclub")
+    @GetMapping("/computerclub")//получить все рабочие станции клуба
     public List<ComputerClub> getAllComputerClub(){
         List<ComputerClub> computerClubList = computerClubService.getAllComputerClub();
-
         return computerClubList;
-
     }
-
 
 
 }

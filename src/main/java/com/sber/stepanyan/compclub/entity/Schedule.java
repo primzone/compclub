@@ -17,7 +17,6 @@ public class Schedule {
     private Timestamp start;
     private Timestamp end;
 
-    private String status;
 
     public Schedule() {
     }

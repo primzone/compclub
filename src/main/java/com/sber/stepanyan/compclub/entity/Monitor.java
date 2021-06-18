@@ -1,9 +1,7 @@
 package com.sber.stepanyan.compclub.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Monitor {
@@ -11,4 +9,73 @@ public class Monitor {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    private String brand;
+    private String model;
+    private String resolution;
+    private int refershRate;
+
+    private double pricePerHour;
+
+    @OneToMany(mappedBy = "monitor")
+    private Set<Workstation> workstations;
+
+
+    public Monitor() {
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public String getResolution() {
+        return resolution;
+    }
+
+    public void setResolution(String resolution) {
+        this.resolution = resolution;
+    }
+
+    public int getRefershRate() {
+        return refershRate;
+    }
+
+    public void setRefershRate(int refershRate) {
+        this.refershRate = refershRate;
+    }
+
+    public double getPricePerHour() {
+        return pricePerHour;
+    }
+
+    public void setPricePerHour(double pricePerHour) {
+        this.pricePerHour = pricePerHour;
+    }
+
+    public Set<Workstation> getWorkstations() {
+        return workstations;
+    }
+
+    public void setWorkstations(Set<Workstation> workstations) {
+        this.workstations = workstations;
+    }
 }

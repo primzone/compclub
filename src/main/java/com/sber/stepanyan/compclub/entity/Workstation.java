@@ -10,6 +10,9 @@ public class Workstation {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    private int workstationNumber;
+
+
     @ManyToOne
     @JoinColumn(name = "computerClub_id")
     private ComputerClub computerClub;
@@ -17,10 +20,20 @@ public class Workstation {
     @OneToMany(mappedBy = "workstation")
     private Set<Schedule> schedules;
 
+    @OneToMany(mappedBy = "workstation")
+    private Set<Order> orders;
+
+    @ManyToOne
+    @JoinColumn(name = "monitor_id")
+    private Monitor monitor;
+
+    @ManyToOne
+    @JoinColumn(name = "systemUnit_id")
+    private SystemUnit systemUnit;
+
 
     public Workstation() {
     }
-
 
     public long getId() {
         return id;
@@ -44,5 +57,29 @@ public class Workstation {
 
     public void setSchedules(Set<Schedule> schedules) {
         this.schedules = schedules;
+    }
+
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    public int getWorkstationNumber() {
+        return workstationNumber;
+    }
+
+    public void setWorkstationNumber(int workstationNumber) {
+        this.workstationNumber = workstationNumber;
+    }
+
+    public Monitor getMonitor() {
+        return monitor;
+    }
+
+    public void setMonitor(Monitor monitor) {
+        this.monitor = monitor;
     }
 }

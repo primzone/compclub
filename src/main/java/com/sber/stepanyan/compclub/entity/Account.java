@@ -1,9 +1,7 @@
 package com.sber.stepanyan.compclub.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 public class Account {
@@ -11,9 +9,15 @@ public class Account {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    @Column(unique = true, nullable = false)
     private String name;
 
-    private double balance;
+    @Column(unique = true, nullable = false)
+    private String accountNumber;
+    private double balance = 0;
+
+    @OneToMany(mappedBy = "account")
+    private Set<Order> orders;
 
 
     public Account() {
@@ -41,5 +45,21 @@ public class Account {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    public Set<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(Set<Order> orders) {
+        this.orders = orders;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
     }
 }

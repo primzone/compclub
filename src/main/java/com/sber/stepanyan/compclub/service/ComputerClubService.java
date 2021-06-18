@@ -1,6 +1,7 @@
 package com.sber.stepanyan.compclub.service;
 
 import com.sber.stepanyan.compclub.entity.ComputerClub;
+import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.ComputerClubRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,8 @@ public class ComputerClubService {
 
 
     public List<ComputerClub> getAllComputerClub() {
-        return computerClubRepository.findAll();
+        List<ComputerClub> allComputerClubs = computerClubRepository.findAll();
+        if (allComputerClubs.isEmpty()) throw new EmptyDataException("У клуба пока нет рабочих станций");
+        return allComputerClubs;
     }
 }
