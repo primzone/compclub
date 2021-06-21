@@ -9,15 +9,23 @@ public class SystemUnit {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
-    @OneToMany(mappedBy = "systemUnit")
-    private Set<Workstation> workstations;
 
-    private double pricePerHour;
-    private String power;
+    @Column(nullable = false)
     private String cpu;
+    @Column(nullable = false)
     private String craphicsCard;
+    @Column(nullable = false)
     private int ram;
+    @Column(nullable = false)
+    private SystemUnitPower power;
+    @Column(nullable = false)
+    private double pricePerHour;
+    @Enumerated(EnumType.STRING)
 
+
+
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "systemUnit")
+    private Set<Workstation> workstations;
 
     public SystemUnit() {
     }
@@ -47,11 +55,11 @@ public class SystemUnit {
         this.pricePerHour = pricePerHour;
     }
 
-    public String getPower() {
+    public SystemUnitPower getPower() {
         return power;
     }
 
-    public void setPower(String power) {
+    public void setPower(SystemUnitPower power) {
         this.power = power;
     }
 

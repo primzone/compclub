@@ -9,14 +9,18 @@ public class Monitor {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    @Column(nullable = false)
     private String brand;
+    @Column(nullable = false)
     private String model;
+    @Column(nullable = false)
     private String resolution;
+    @Column(nullable = false)
     private int refershRate;
-
+    @Column(nullable = false)
     private double pricePerHour;
 
-    @OneToMany(mappedBy = "monitor")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "monitor")
     private Set<Workstation> workstations;
 
 

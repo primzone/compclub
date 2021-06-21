@@ -1,5 +1,7 @@
 package com.sber.stepanyan.compclub.entity;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.util.Set;
 
@@ -10,10 +12,13 @@ public class Workstation {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private long id;
 
+    @Column(nullable = false, unique = true)
+//    @GenericGenerator(name="kaugen" , strategy="increment")
+//    @GeneratedValue(generator="kaugen")
     private int workstationNumber;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "computerClub_id")
     private ComputerClub computerClub;
 
@@ -23,16 +28,23 @@ public class Workstation {
     @OneToMany(mappedBy = "workstation")
     private Set<Order> orders;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "monitor_id")
     private Monitor monitor;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "systemUnit_id")
     private SystemUnit systemUnit;
 
 
     public Workstation() {
+    }
+
+    public Workstation(int workstationNumber, ComputerClub computerClub, Monitor monitor, SystemUnit systemUnit) {
+        this.workstationNumber = workstationNumber;
+        this.computerClub = computerClub;
+        this.monitor = monitor;
+        this.systemUnit = systemUnit;
     }
 
     public long getId() {
@@ -81,5 +93,13 @@ public class Workstation {
 
     public void setMonitor(Monitor monitor) {
         this.monitor = monitor;
+    }
+
+    public SystemUnit getSystemUnit() {
+        return systemUnit;
+    }
+
+    public void setSystemUnit(SystemUnit systemUnit) {
+        this.systemUnit = systemUnit;
     }
 }

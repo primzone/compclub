@@ -1,7 +1,10 @@
 package com.sber.stepanyan.compclub.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class ComputerClub {
@@ -14,9 +17,17 @@ public class ComputerClub {
     private String name;
 
 
-    @OneToMany(mappedBy = "computerClub")
-    private List<Workstation> workstations;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "computerClub")
+    private Set<Workstation> workstations;
 
+
+    public void addWorkstationToComputerClub(Workstation workstation){
+        if (workstations == null){
+            workstations = new HashSet<>();
+        }
+        workstations.add(workstation);
+        workstation.setComputerClub(this);
+    }
 
     public ComputerClub() {
     }
@@ -52,11 +63,11 @@ public class ComputerClub {
     }
 
 
-    public List<Workstation> getComputers() {
+    public Set<Workstation> getWorkstations() {
         return workstations;
     }
 
-    public void setComputers(List<Workstation> workstations) {
+    public void setWorkstations(Set<Workstation> workstations) {
         this.workstations = workstations;
     }
 
