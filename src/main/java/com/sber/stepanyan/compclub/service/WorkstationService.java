@@ -1,13 +1,13 @@
 package com.sber.stepanyan.compclub.service;
 
-import com.sber.stepanyan.compclub.DTO.WorkstationDTO;
+import com.sber.stepanyan.compclub.DTO.WorkstationDTO.WorkstationDTO;
 import com.sber.stepanyan.compclub.entity.ComputerClub;
 import com.sber.stepanyan.compclub.entity.Monitor;
 import com.sber.stepanyan.compclub.entity.SystemUnit;
 import com.sber.stepanyan.compclub.entity.Workstation;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
+import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.WorkstationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,24 +51,46 @@ public class WorkstationService {
 
     public long addWorkstation(WorkstationDTO workstationDTO) {
 
-        ComputerClub computerClub = computerClubService.getComputerClubById(workstationDTO.getComputerClubId());
-        Monitor monitor = monitorService.getMonitorById(workstationDTO.getMonitorId());
-        SystemUnit systemUnit = systemUnitService.getSystemUnitById(workstationDTO.getComputerClubId());
+        checkValuesForNull(workstationDTO);
+        Workstation addedWorkstation = checkValuesForCorrectness(workstationDTO, new Workstation());
 
-        Workstation workstation = new Workstation(
-                workstationDTO.getWorkstationNumber(),
-                computerClub,
-                monitor,
-                systemUnit
-        );
-        //добавить все проверки на валидацию (номер раб станции)
-
-        Workstation addedWorkstation = workstationRepository.save(workstation);
+        workstationRepository.save(addedWorkstation);
 
         return addedWorkstation.getId();
 
     }
 
+    private Workstation checkValuesForCorrectness(WorkstationDTO workstationDTO, Workstation workstation) {
+        if (workstationDTO.getWorkstationNumber() != null){
+            if (workstationDTO.getWorkstationNumber() > 0 ){
+                if (workstationRepository.findWorkstationByWorkstationNumber(workstationDTO.getWorkstationNumber()).isPresent())
+                        throw new InvalidValuesException("Workstation с таким номером уже существует");
+                workstation.setWorkstationNumber(workstationDTO.getWorkstationNumber());
+            } else throw new InvalidValuesException("Номер workstation должен быть больше 0");
+        }
+
+        if (workstationDTO.getComputerClubId() != null)
+            workstation.setComputerClub(computerClubService.getComputerClubById(workstationDTO.getComputerClubId()));
+
+        if (workstationDTO.getMonitorId() != null)
+            workstation.setMonitor(monitorService.getMonitorById(workstationDTO.getMonitorId()));
+
+        if (workstationDTO.getSystemUnitId() != null)
+            workstation.setSystemUnit(systemUnitService.getSystemUnitById(workstationDTO.getComputerClubId()));
+
+        return workstation;
+    }
+
+    private void checkValuesForNull(WorkstationDTO workstationDTO) {
+        if (workstationDTO.getWorkstationNumber() == null)
+            throw new EmptyDataException("не указан номер workstation");
+        if (workstationDTO.getComputerClubId() == null)
+            throw new EmptyDataException("не указан id компьютерного клуба");
+        if (workstationDTO.getMonitorId() == null)
+            throw new EmptyDataException("не указан id монитора");
+        if (workstationDTO.getSystemUnitId() == null)
+            throw new EmptyDataException("не указан id системного блока");
+    }
 
 
     public void deleteWorkstation(long id) {
@@ -77,11 +99,15 @@ public class WorkstationService {
 
     public Workstation updateWorkstation(WorkstationDTO workstationDTO) {
 
+        if (workstationDTO.getId() == null) throw new EmptyDataException("не указан id workstation");
         Workstation workstation = getWorkstationById(workstationDTO.getId());
 
-        //ДОДЕЛАТЬ
+        Workstation updatedWorkstation = checkValuesForCorrectness(workstationDTO, workstation);
 
-        return workstation;
+        //ДОДЕЛАТЬ
+        workstationRepository.save(updatedWorkstation);
+
+        return updatedWorkstation;
 
     }
 }

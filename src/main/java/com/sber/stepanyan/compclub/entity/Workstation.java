@@ -1,8 +1,14 @@
 package com.sber.stepanyan.compclub.entity;
 
-import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity
@@ -10,22 +16,22 @@ public class Workstation {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
-
-    @Column(nullable = false, unique = true)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "workstationNumber", nullable = false, unique = true)
 //    @GenericGenerator(name="kaugen" , strategy="increment")
 //    @GeneratedValue(generator="kaugen")
-    private int workstationNumber;
-
-
+    private Integer workstationNumber;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "computerClub_id")
     private ComputerClub computerClub;
 
     @OneToMany(mappedBy = "workstation")
+    @Column(name = "schedules")
     private Set<Schedule> schedules;
 
     @OneToMany(mappedBy = "workstation")
+    @Column(name = "orders")
     private Set<Order> orders;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})

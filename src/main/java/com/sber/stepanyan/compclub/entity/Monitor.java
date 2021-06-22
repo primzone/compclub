@@ -1,37 +1,61 @@
 package com.sber.stepanyan.compclub.entity;
 
-import javax.persistence.*;
+import com.sber.stepanyan.compclub.DTO.MonitorDTO;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.Set;
 
 @Entity
 public class Monitor {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
-
-    @Column(nullable = false)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "brand", nullable = false)
     private String brand;
-    @Column(nullable = false)
+    @Column(name = "model", nullable = false)
     private String model;
-    @Column(nullable = false)
+    @Column(name = "resolution", nullable = false)
     private String resolution;
-    @Column(nullable = false)
-    private int refershRate;
-    @Column(nullable = false)
-    private double pricePerHour;
-
+    @Column(name = "refershRate", nullable = false)
+    private Integer refershRate;
+    @Column(name = "pricePerHour", nullable = false)
+    private Double pricePerHour;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "monitor")
+    @Column(name = "workstations")
     private Set<Workstation> workstations;
 
 
     public Monitor() {
     }
 
-    public long getId() {
+    public Monitor(MonitorDTO monitorDTO) {
+        this.brand = monitorDTO.getBrand();
+        this.model = monitorDTO.getModel();
+        this.resolution = monitorDTO.getResolution();
+        this.refershRate = monitorDTO.getRefershRate();
+        this.pricePerHour = monitorDTO.getPricePerHour();
+    }
+
+    public Monitor(String brand, String model, String resolution, Integer refershRate, Double pricePerHour) {
+        this.brand = brand;
+        this.model = model;
+        this.resolution = resolution;
+        this.refershRate = refershRate;
+        this.pricePerHour = pricePerHour;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -59,19 +83,19 @@ public class Monitor {
         this.resolution = resolution;
     }
 
-    public int getRefershRate() {
+    public Integer getRefershRate() {
         return refershRate;
     }
 
-    public void setRefershRate(int refershRate) {
+    public void setRefershRate(Integer refershRate) {
         this.refershRate = refershRate;
     }
 
-    public double getPricePerHour() {
+    public Double getPricePerHour() {
         return pricePerHour;
     }
 
-    public void setPricePerHour(double pricePerHour) {
+    public void setPricePerHour(Double pricePerHour) {
         this.pricePerHour = pricePerHour;
     }
 

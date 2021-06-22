@@ -1,9 +1,13 @@
 package com.sber.stepanyan.compclub.entity;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -11,13 +15,14 @@ public class ComputerClub {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
-
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "address")
     private String address;
+    @Column(name = "name", unique = true)
     private String name;
-
-
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "computerClub")
+    @Column(name = "workstations")
     private Set<Workstation> workstations;
 
 
@@ -38,11 +43,11 @@ public class ComputerClub {
     }
 
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -50,8 +55,8 @@ public class ComputerClub {
         return address;
     }
 
-    public void setAddress(String adress) {
-        this.address = adress;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getName() {
@@ -61,7 +66,6 @@ public class ComputerClub {
     public void setName(String name) {
         this.name = name;
     }
-
 
     public Set<Workstation> getWorkstations() {
         return workstations;

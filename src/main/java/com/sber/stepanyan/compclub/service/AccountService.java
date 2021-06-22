@@ -1,15 +1,15 @@
 package com.sber.stepanyan.compclub.service;
 
 
-import com.sber.stepanyan.compclub.DTO.IncreaseBalance;
+import com.sber.stepanyan.compclub.DTO.AccountDTO.AddAccountDTO;
+import com.sber.stepanyan.compclub.DTO.AccountDTO.IncreaseBalance;
 import com.sber.stepanyan.compclub.entity.Account;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.AccountRepository;
 import com.sber.stepanyan.compclub.utils.Utils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+
 
 import java.util.Optional;
 
@@ -30,18 +30,14 @@ public class AccountService {
 
     }
 
-    public long addAccount(Account account) {
+    public long addAccount(AddAccountDTO addAccountDTO) {
 
-        Account newAccount;
-        try {
-            account.setAccountNumber(Utils.generateAccountNumber());
-            newAccount = accountRepository.save(account);
-        }catch (Exception e){
-            e.printStackTrace();
-            throw new InvalidValuesException("Не удалось добавить счет, проверьте правильность введеных данных");
-        }
+        Account account = new Account(addAccountDTO.getName(), Utils.generateAccountNumber());
+        checkAccountValidation(account);
 
-        return newAccount.getId();
+        Account addedAccount = accountRepository.save(account);
+
+        return addedAccount.getId();
 
     }
 
@@ -59,5 +55,21 @@ public class AccountService {
 
     }
 
+    void checkAccountValidation(Account account){
 
+        if (accountRepository.findAccountByName(account.getName()).isPresent())
+            throw new InvalidValuesException("Личный аккаунт с таким именем уже существует");
+        else if (account.getName().length() < 3 && account.getName().length() > 30)
+            throw new InvalidValuesException("Длина имени должна быть в промежутке от 3 до 30 символов");
+        else if (accountRepository.findAccountByAccountNumber(account.getAccountNumber()).isPresent()){
+            //случайно сгенерился одинаковый личный счет, нужно снова пересоздать
+            addAccount(new AddAccountDTO(account.getName()));
+        }
+    }
+
+
+    public void deleteAccountById(Long id) {
+
+        accountRepository.deleteById(id);
+    }
 }

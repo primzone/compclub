@@ -1,11 +1,18 @@
 package com.sber.stepanyan.compclub.controller;
 
-import com.sber.stepanyan.compclub.entity.ComputerClub;
+import com.sber.stepanyan.compclub.DTO.MonitorDTO;
 import com.sber.stepanyan.compclub.entity.Monitor;
 import com.sber.stepanyan.compclub.service.MonitorService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -21,25 +28,30 @@ public class MonitorController {
 
 
     @GetMapping("/monitors")//получить все доступные мониторы
-    public List<Monitor> getAllMonitors(){
+    public List<MonitorDTO> getAllMonitors(){
 
         List<Monitor> monitorslist = monitorService.getAllMonitors();
 
-        return monitorslist;
+        List<MonitorDTO> monitorDTOList = new ArrayList<>();
+        for (Monitor m : monitorslist) {
+            monitorDTOList.add(new MonitorDTO(m));
+        }
+        return monitorDTOList;
     }
 
     @GetMapping("/monitors/{id}")//получить монитор по id
-    public Monitor getMonitorById(@PathVariable long id){
+    public MonitorDTO getMonitorById(@PathVariable long id){
 
-        return monitorService.getMonitorById(id);
+        Monitor monitor = monitorService.getMonitorById(id);
+        return  new MonitorDTO(monitor);
 
     }
 
 
     @PostMapping("/monitors")//добавить монитор
-    public long addMonitor(@RequestBody Monitor monitor){
+    public long addMonitor(@RequestBody MonitorDTO monitorDTO){
 
-        long l = monitorService.addMonitor(monitor);
+        long l = monitorService.addMonitor(monitorDTO);
         return l;
     }
 
@@ -51,12 +63,12 @@ public class MonitorController {
     }
 
 
-    @PutMapping("/monitors")
-    public Monitor updateMonitor(@RequestBody Monitor monitor){
+    @PutMapping("/monitors")//изменение монитора
+    public MonitorDTO updateMonitor(@RequestBody MonitorDTO monitorDTO){
 
-        Monitor updatedMonitor =  monitorService.updateMonitor(monitor);
+        Monitor updatedMonitor =  monitorService.updateMonitor(monitorDTO);
 
-        return updatedMonitor;
+        return new MonitorDTO(updatedMonitor);
     }
 
 

@@ -1,6 +1,12 @@
 package com.sber.stepanyan.compclub.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.sql.Timestamp;
 
 @Entity
@@ -8,33 +14,34 @@ public class Schedule {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
-
+    @Column(name = "id")
+    private Long id;
     @ManyToOne
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
-
+    @Column(name = "start")
     private Timestamp start;
+    @Column(name = "end")
     private Timestamp end;
 
 
     public Schedule() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public Workstation getComputer() {
+    public Workstation getWorkstation() {
         return workstation;
     }
 
-    public void setComputer(Workstation workStation) {
-        this.workstation = workStation;
+    public void setWorkstation(Workstation workstation) {
+        this.workstation = workstation;
     }
 
     public Timestamp getStart() {

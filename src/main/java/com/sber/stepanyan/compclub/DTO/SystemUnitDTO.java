@@ -1,38 +1,40 @@
-package com.sber.stepanyan.compclub.entity;
+package com.sber.stepanyan.compclub.DTO;
 
-import javax.persistence.CascadeType;
+import com.sber.stepanyan.compclub.entity.SystemUnit;
+import com.sber.stepanyan.compclub.entity.SystemUnitPower;
+
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import java.util.Set;
 
-@Entity
-public class SystemUnit {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    @Column(name = "id")
+public class SystemUnitDTO {
+
     private Long id;
-    @Column(name = "cpu", nullable = false)
     private String cpu;
-    @Column(name = "craphicsCard", nullable = false)
     private String craphicsCard;
-    @Column(name = "ram", nullable = false)
     private Integer ram;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "power", nullable = false)
     private SystemUnitPower power;
-    @Column(name = "pricePerHour", nullable = false)
     private Double pricePerHour;
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "systemUnit")
-    @Column(name = "workstations")
-    private Set<Workstation> workstations;
 
-    public SystemUnit() {
+    public SystemUnitDTO() {
+    }
+
+    public SystemUnitDTO(SystemUnit systemUnit) {
+        this.id = systemUnit.getId();
+        this.cpu = systemUnit.getCpu();
+        this.craphicsCard = systemUnit.getCraphicsCard();
+        this.ram = systemUnit.getRam();
+        this.power = systemUnit.getPower();
+        this.pricePerHour = systemUnit.getPricePerHour();
+    }
+
+    public SystemUnitDTO(Long id, String cpu, String craphicsCard, Integer ram, SystemUnitPower power, Double pricePerHour) {
+        this.id = id;
+        this.cpu = cpu;
+        this.craphicsCard = craphicsCard;
+        this.ram = ram;
+        this.power = power;
+        this.pricePerHour = pricePerHour;
     }
 
     public Long getId() {
@@ -81,13 +83,5 @@ public class SystemUnit {
 
     public void setPricePerHour(Double pricePerHour) {
         this.pricePerHour = pricePerHour;
-    }
-
-    public Set<Workstation> getWorkstations() {
-        return workstations;
-    }
-
-    public void setWorkstations(Set<Workstation> workstations) {
-        this.workstations = workstations;
     }
 }

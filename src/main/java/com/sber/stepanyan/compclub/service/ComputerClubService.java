@@ -1,6 +1,8 @@
 package com.sber.stepanyan.compclub.service;
 
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO;
 import com.sber.stepanyan.compclub.entity.ComputerClub;
+import com.sber.stepanyan.compclub.entity.Monitor;
 import com.sber.stepanyan.compclub.entity.Workstation;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
@@ -22,15 +24,40 @@ public class ComputerClubService {
     }
 
 
-    public long addComputerClub(ComputerClub computerClub) {
+    public long addComputerClub(ComputerClubDTO computerClubDTO) {
 
-        //добавить все проверки
-        if (computerClub.getAddress() == null || computerClub.getName() == null){
-            throw new InvalidValuesException("Неверные адрес или имя");
-        }
+        checkValuesForNull(computerClubDTO);
+        ComputerClub computerClub = checkValuesForCorrectness(computerClubDTO, new ComputerClub());
+
         ComputerClub addedComputerClub = computerClubRepository.save(computerClub);
 
         return addedComputerClub.getId();
+    }
+
+    private ComputerClub checkValuesForCorrectness(ComputerClubDTO computerClubDTO, ComputerClub computerClub) {
+        if (computerClubDTO.getName() != null){
+            if (computerClubDTO.getName().length() >= 2 && computerClubDTO.getName().length() <= 20){
+
+                if (computerClubRepository.findComputerClubByName(computerClubDTO.getName()).isEmpty())
+                    computerClub.setName(computerClubDTO.getName());
+                else throw new InvalidValuesException("Компьютерный клуб с таким именем уже существует");
+            }
+            else throw new InvalidValuesException("В названии клуба должно быть от 2 до 20 символов");
+        }
+        if (computerClubDTO.getAddress() != null){
+            if (computerClubDTO.getAddress().length() >= 2 && computerClubDTO.getAddress().length() <= 200)
+                computerClub.setAddress(computerClubDTO.getAddress());
+            else throw new InvalidValuesException("В названии клуба должно быть от 2 до 200 символов");
+        }
+
+        return computerClub;
+    }
+
+    private void checkValuesForNull(ComputerClubDTO computerClubDTO) {
+        if (computerClubDTO.getAddress() == null)
+            throw new EmptyDataException("не указан адрес компьютерного клуба");
+        if (computerClubDTO.getName() == null)
+            throw new EmptyDataException("не указано название компьютерного клуба");
     }
 
 
@@ -40,7 +67,7 @@ public class ComputerClubService {
         return allComputerClubs;
     }
 
-    public ComputerClub getComputerClubById(long id) {
+    public ComputerClub getComputerClubById(Long id) {
 
         Optional<ComputerClub> computerClubOptional = computerClubRepository.findById(id);
         if (computerClubOptional.isEmpty())
@@ -50,38 +77,31 @@ public class ComputerClubService {
 
     }
 
-    public ComputerClub updateComputerClub(ComputerClub computerClub) {
+    public ComputerClub updateComputerClub(ComputerClubDTO computerClubDTO) {
 
-        Optional<ComputerClub> computerClubOptional = computerClubRepository.findById(computerClub.getId());
+
+        if (computerClubDTO.getId() == null) throw new EmptyDataException("Не указан id комрьютерного клуба");
+        Optional<ComputerClub> computerClubOptional = computerClubRepository.findById(computerClubDTO.getId());
         if (computerClubOptional.isEmpty())
-            throw new EmptyDataException("Не найден компьютерный клуб с id = " + computerClub.getId());
+            throw new EmptyDataException("Не найден компьютерный клуб с id = " + computerClubDTO.getId());
 
 
-        ComputerClub oldComputerClub = computerClubOptional.get();
+        ComputerClub updatedComputerClub = checkValuesForCorrectness(computerClubDTO, computerClubOptional.get());
 
-        if (computerClub.getAddress() != null){
-            oldComputerClub.setAddress(computerClub.getAddress());
-        }
-        if (computerClub.getName() != null){
-            oldComputerClub.setName(computerClub.getName());
-        }
-
-        //добавить проверки на валидацию перед сохранением
-        ComputerClub updatedComputerClub = computerClubRepository.save(oldComputerClub);
+        computerClubRepository.save(updatedComputerClub);
 
         return updatedComputerClub;
 
     }
 
     public void deleteComputerClubById(long id) {
-
+        //удалить каскадно все workstation and orders? или запрет на удаление?
         computerClubRepository.deleteById(id);
     }
 
     public Set<Workstation> getWorkstationsByCompClubId(long id) {
 
         ComputerClub computerClub = getComputerClubById(id);
-
         Set<Workstation> workstations = computerClub.getWorkstations();
         if (workstations.isEmpty())
             throw new EmptyDataException("У компьютерного клуба с id = " + id + " нет рабочих станций");

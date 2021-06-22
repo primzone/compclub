@@ -1,14 +1,21 @@
 package com.sber.stepanyan.compclub.controller;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO;
 import com.sber.stepanyan.compclub.entity.ComputerClub;
 import com.sber.stepanyan.compclub.entity.Workstation;
-import com.sber.stepanyan.compclub.responses.MyResponse;
 import com.sber.stepanyan.compclub.service.ComputerClubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -36,24 +43,32 @@ public class ComputerClubController {
 
 
     @GetMapping("/computerclub")//получить все компьютерные клубы
-    public List<ComputerClub> getAllComputerClub(){
+    public List<ComputerClubDTO> getAllComputerClub(){
+
         List<ComputerClub> computerClubList = computerClubService.getAllComputerClub();
-        return computerClubList;
+        List<ComputerClubDTO> computerClubDTOList = new ArrayList<>();
+
+        for (ComputerClub c : computerClubList) {
+            computerClubDTOList.add(new ComputerClubDTO(c));
+        }
+
+        return computerClubDTOList;
+
     }
 
     @GetMapping("/computerclub/{id}")//получить компьютерный клуб по айди
-    public ComputerClub getComputerClubById(@PathVariable long id){
+    public ComputerClubDTO getComputerClubById(@PathVariable Long id){
 
         ComputerClub computerClub = computerClubService.getComputerClubById(id);
-        return computerClub;
+        return new ComputerClubDTO(computerClub);
     }
 
 
 
     @PostMapping("/computerclub")// добавить рабочую станцию клубу
-    public long addComputerClub(@RequestBody ComputerClub computerClub){
+    public long addComputerClub(@RequestBody ComputerClubDTO computerClubDTO){
 
-        long computerClubId = computerClubService.addComputerClub(computerClub);
+        long computerClubId = computerClubService.addComputerClub(computerClubDTO);
 
         return computerClubId;
 
@@ -61,10 +76,11 @@ public class ComputerClubController {
 
 
     @PutMapping("/computerclub")// добавить рабочую станцию клубу
-    public ComputerClub updateComputerClub(@RequestBody ComputerClub computerClub){
+    public ComputerClubDTO updateComputerClub(@RequestBody ComputerClubDTO computerClubDTO){
 
-        ComputerClub updatedComputerClub = computerClubService.updateComputerClub(computerClub);
-        return updatedComputerClub;
+        ComputerClub updatedComputerClub = computerClubService.updateComputerClub(computerClubDTO);
+
+        return new ComputerClubDTO(updatedComputerClub);
 
     }
 
@@ -76,7 +92,6 @@ public class ComputerClubController {
         return id;
 
     }
-
 
 
     @GetMapping("/computerclub/workstations/{id}")//получить все доступные рабочие станции по клуба по айди

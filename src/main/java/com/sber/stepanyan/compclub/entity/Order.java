@@ -1,21 +1,28 @@
 package com.sber.stepanyan.compclub.entity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private long id;
-
-    private long orderNumber;
-    private double count;
-    private boolean paid;
-
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "orderNumber")
+    private Long orderNumber;
+    @Column(name = "count")
+    private Double count;
+    @Column(name = "paid")
+    private Boolean paid;
     @ManyToOne
     @JoinColumn(name = "account_id")
     private Account account;
-
     @ManyToOne
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
@@ -23,28 +30,36 @@ public class Order {
     public Order() {
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public long getOrderNumber() {
+    public Long getOrderNumber() {
         return orderNumber;
     }
 
-    public void setOrderNumber(long orderNumber) {
+    public void setOrderNumber(Long orderNumber) {
         this.orderNumber = orderNumber;
     }
 
-    public double getCount() {
+    public Double getCount() {
         return count;
     }
 
-    public void setCount(double count) {
+    public void setCount(Double count) {
         this.count = count;
+    }
+
+    public Boolean getPaid() {
+        return paid;
+    }
+
+    public void setPaid(Boolean paid) {
+        this.paid = paid;
     }
 
     public Account getAccount() {
@@ -61,13 +76,5 @@ public class Order {
 
     public void setWorkstation(Workstation workstation) {
         this.workstation = workstation;
-    }
-
-    public boolean isPaid() {
-        return paid;
-    }
-
-    public void setPaid(boolean paid) {
-        this.paid = paid;
     }
 }

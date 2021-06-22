@@ -1,8 +1,8 @@
-package com.sber.stepanyan.compclub.DTO;
+package com.sber.stepanyan.compclub.DTO.AccountDTO;
 
 public class IncreaseBalance {
 
-    private String AccountNumber;
+    private String accountNumber;
 
     private double payment;
 
@@ -10,16 +10,16 @@ public class IncreaseBalance {
     }
 
     public IncreaseBalance(String accountNumber, double payment) {
-        AccountNumber = accountNumber;
+        this.accountNumber = accountNumber;
         this.payment = payment;
     }
 
     public String getAccountNumber() {
-        return AccountNumber;
+        return accountNumber;
     }
 
     public void setAccountNumber(String accountNumber) {
-        AccountNumber = accountNumber;
+        this.accountNumber = accountNumber;
     }
 
     public double getPayment() {

@@ -1,11 +1,15 @@
 package com.sber.stepanyan.compclub.service;
 
+import com.sber.stepanyan.compclub.DTO.SystemUnitDTO;
+import com.sber.stepanyan.compclub.entity.Monitor;
 import com.sber.stepanyan.compclub.entity.SystemUnit;
+import com.sber.stepanyan.compclub.entity.SystemUnitPower;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
+import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.SystemUnitRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,61 +43,80 @@ public class SystemUnitService {
 
     }
 
-    public long addSystemUnit(SystemUnit systemUnit) {
+    public long addSystemUnit(SystemUnitDTO systemUnitDTO) {
 
-        checkValuesForSystemUnit(systemUnit);
-        //нужны ли проверки?
+        checkValuesForNull(systemUnitDTO);
+        SystemUnit systemUnit = checkValuesForCorrectness(systemUnitDTO, new SystemUnit());
+
         SystemUnit addedSystemUnit = systemUnitRepository.save(systemUnit);
 
         return addedSystemUnit.getId();
 
     }
 
-    void checkValuesForSystemUnit(SystemUnit systemUnit){
+    private SystemUnit checkValuesForCorrectness(SystemUnitDTO systemUnitDTO, SystemUnit systemUnit) {
 
-        //дописать валидацию
-        if (systemUnit.getCpu() == null)
+        if (systemUnitDTO.getCpu() != null){
+            if (systemUnitDTO.getCpu().length() >= 3 && systemUnitDTO.getCpu().length() <= 20)
+                systemUnit.setCpu(systemUnitDTO.getCpu());
+            else throw new InvalidValuesException("Длина поля CPU должна быть от 3 до 20 символов");
+        }
+
+        if (systemUnitDTO.getCraphicsCard() != null){
+            if (systemUnitDTO.getCraphicsCard().length() >= 3 && systemUnitDTO.getCraphicsCard().length() <= 20)
+                systemUnit.setCraphicsCard(systemUnitDTO.getCraphicsCard());
+            else throw new InvalidValuesException("Длина поля CraphicsCard должна быть от 3 до 20 символов");
+        }
+
+        if (systemUnitDTO.getRam() != null){
+            if (systemUnitDTO.getRam() >= 2 && systemUnitDTO.getRam() <= 256)
+                systemUnit.setRam(systemUnitDTO.getRam());
+            else throw new InvalidValuesException("Ram должен быть от 2 до 256Гб");
+        }
+
+        if (systemUnitDTO.getPricePerHour() != null){
+            if (systemUnitDTO.getPricePerHour() >= 100 && systemUnitDTO.getPricePerHour() <= 500)
+                systemUnit.setPricePerHour(systemUnitDTO.getPricePerHour());
+            else throw new InvalidValuesException("Стоимость часа системного блока должна быть от 100 до 500р");
+        }
+        if (systemUnitDTO.getPower() != null){
+
+           // SystemUnitPower.valueOf(systemUnitDTO.getPower().name());
+
+            if (SystemUnitPower.contains(systemUnitDTO.getPower().name())){
+                systemUnit.setPower(systemUnitDTO.getPower());
+            }
+            else throw new InvalidValuesException("Допустымые значения для Power " + Arrays.toString(SystemUnitPower.values()));
+        }
+
+        return systemUnit;
+    }
+
+    private void checkValuesForNull(SystemUnitDTO systemUnitDTO) {
+        if (systemUnitDTO.getCpu() == null)
             throw new EmptyDataException("Не указан процессор системного блока");
-        else if (systemUnit.getCraphicsCard() == null)
+        else if (systemUnitDTO.getCraphicsCard() == null)
             throw new EmptyDataException("Не указана видеокарта системного блока");
-        else if (systemUnit.getPricePerHour() == 0.0)
+        else if (systemUnitDTO.getPricePerHour() == null)
             throw new EmptyDataException("Не указана цена за час системного блока");
-        else if (systemUnit.getRam() == 0)
+        else if (systemUnitDTO.getRam() == null)
             throw new EmptyDataException("Не указана оперативная память системного блока");
-        else if (systemUnit.getPower() == null)
+        else if (systemUnitDTO.getPower() == null)
             throw new EmptyDataException("Не указана мощность системного блока");
-
     }
 
 
-    public SystemUnit updateSystemUnit(SystemUnit systemUnit) {
 
+    public SystemUnit updateSystemUnit(SystemUnitDTO systemUnitDTO) {
 
-        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(systemUnit.getId());
+        if (systemUnitDTO.getId() == null) throw new EmptyDataException("не указан id системного блока");
+        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(systemUnitDTO.getId());
         if (systemUnitOptional.isEmpty())
-            throw new EmptyDataException("Не найден системный блок с id = " + systemUnit.getId());
+            throw new EmptyDataException("Не найден системный блок с id = " + systemUnitDTO.getId());
 
-        SystemUnit oldSystemUnit = systemUnitOptional.get();
+        SystemUnit updatedSystemUnit = checkValuesForCorrectness(systemUnitDTO, systemUnitOptional.get());
 
-        if (systemUnit.getCpu() != null && !systemUnit.getCpu().equals(oldSystemUnit.getCpu())){
-            oldSystemUnit.setCpu(systemUnit.getCpu());
-        }
-        if (systemUnit.getCraphicsCard() != null && !systemUnit.getCraphicsCard().equals(oldSystemUnit.getCraphicsCard())){
-            oldSystemUnit.setCraphicsCard(systemUnit.getCraphicsCard());
-        }
-        if (systemUnit.getPower() != null && !systemUnit.getPower().equals(oldSystemUnit.getPower())){
-            oldSystemUnit.setPower(systemUnit.getPower());
-        }
-        if (systemUnit.getPricePerHour() != 0.0){
-            oldSystemUnit.setPricePerHour(systemUnit.getPricePerHour());
-        }
-        if (systemUnit.getRam() != 0){
-            oldSystemUnit.setRam(systemUnit.getRam());
-        }
-
-
-
-        SystemUnit updatedSystemUnit = systemUnitRepository.save(oldSystemUnit);
+        systemUnitRepository.save(updatedSystemUnit);
 
         return updatedSystemUnit;
     }
