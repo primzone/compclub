@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import java.sql.Timestamp;
 
 @Entity
@@ -23,9 +24,16 @@ public class Schedule {
     private Timestamp start;
     @Column(name = "end")
     private Timestamp end;
-
+    @OneToOne(mappedBy = "schedule")
+    private Order order;
 
     public Schedule() {
+    }
+
+    public Schedule(Workstation workstation, Timestamp start, Timestamp end) {
+        this.workstation = workstation;
+        this.start = start;
+        this.end = end;
     }
 
     public Long getId() {
@@ -58,5 +66,13 @@ public class Schedule {
 
     public void setEnd(Timestamp end) {
         this.end = end;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
     }
 }

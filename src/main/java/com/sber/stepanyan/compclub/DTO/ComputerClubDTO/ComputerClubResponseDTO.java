@@ -1,36 +1,28 @@
-package com.sber.stepanyan.compclub.DTO;
+package com.sber.stepanyan.compclub.DTO.ComputerClubDTO;
 
 import com.sber.stepanyan.compclub.entity.ComputerClub;
 
-import javax.persistence.Column;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-public class ComputerClubDTO {
+public class ComputerClubResponseDTO {
 
-    private Long id;
-    private String address;
     private String name;
+    private String address;
 
-    public ComputerClubDTO() {
+
+    public ComputerClubResponseDTO() {
     }
 
-    public ComputerClubDTO(ComputerClub computerClub) {
-        this.id = computerClub.getId();
+    public ComputerClubResponseDTO(ComputerClub computerClub) {
         this.address = computerClub.getAddress();
         this.name = computerClub.getName();
     }
 
-    public ComputerClubDTO(Long id, String address, String name) {
-        this.id = id;
+    public ComputerClubResponseDTO(Long id, String address, String name) {
         this.address = address;
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getAddress() {

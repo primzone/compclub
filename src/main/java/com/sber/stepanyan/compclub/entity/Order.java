@@ -1,5 +1,6 @@
 package com.sber.stepanyan.compclub.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -7,6 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Order {
@@ -20,12 +22,15 @@ public class Order {
     private Double count;
     @Column(name = "paid")
     private Boolean paid;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "account_id")
     private Account account;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
 
     public Order() {
     }
@@ -76,5 +81,13 @@ public class Order {
 
     public void setWorkstation(Workstation workstation) {
         this.workstation = workstation;
+    }
+
+    public Schedule getSchedule() {
+        return schedule;
+    }
+
+    public void setSchedule(Schedule schedule) {
+        this.schedule = schedule;
     }
 }

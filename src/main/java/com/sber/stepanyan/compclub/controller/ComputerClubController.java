@@ -1,11 +1,14 @@
 package com.sber.stepanyan.compclub.controller;
 
-import com.sber.stepanyan.compclub.DTO.ComputerClubDTO;
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.AddComputerClubDTO;
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.ComputerClubResponseDTO;
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.UpdateComputerClubDTO;
 import com.sber.stepanyan.compclub.entity.ComputerClub;
 import com.sber.stepanyan.compclub.entity.Workstation;
 import com.sber.stepanyan.compclub.service.ComputerClubService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,10 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Validated
 @RestController
 @RequestMapping("employee")
 public class ComputerClubController {
@@ -43,63 +49,39 @@ public class ComputerClubController {
 
 
     @GetMapping("/computerclub")//получить все компьютерные клубы
-    public List<ComputerClubDTO> getAllComputerClub(){
-
-        List<ComputerClub> computerClubList = computerClubService.getAllComputerClub();
-        List<ComputerClubDTO> computerClubDTOList = new ArrayList<>();
-
-        for (ComputerClub c : computerClubList) {
-            computerClubDTOList.add(new ComputerClubDTO(c));
-        }
-
-        return computerClubDTOList;
-
+    public List<ComputerClubResponseDTO> getAllComputerClub(){
+        return computerClubService.getAllComputerClub();
     }
 
     @GetMapping("/computerclub/{id}")//получить компьютерный клуб по айди
-    public ComputerClubDTO getComputerClubById(@PathVariable Long id){
-
-        ComputerClub computerClub = computerClubService.getComputerClubById(id);
-        return new ComputerClubDTO(computerClub);
+    public ComputerClubResponseDTO getComputerClubById(@PathVariable @Min(value = 1, message = "минимальный id = 1") Long id){
+        return computerClubService.getComputerClubById(id);
     }
-
-
 
     @PostMapping("/computerclub")// добавить рабочую станцию клубу
-    public long addComputerClub(@RequestBody ComputerClubDTO computerClubDTO){
-
-        long computerClubId = computerClubService.addComputerClub(computerClubDTO);
-
-        return computerClubId;
-
+    public Long addComputerClub(@Valid @RequestBody AddComputerClubDTO addComputerClubDTO){
+        return computerClubService.addComputerClub(addComputerClubDTO);
     }
 
+    @PutMapping("/computerclub")// изменить рабочую станцию клубу
+    public UpdateComputerClubDTO updateComputerClub(@Valid @RequestBody UpdateComputerClubDTO updateComputerClubDTO){
 
-    @PutMapping("/computerclub")// добавить рабочую станцию клубу
-    public ComputerClubDTO updateComputerClub(@RequestBody ComputerClubDTO computerClubDTO){
-
-        ComputerClub updatedComputerClub = computerClubService.updateComputerClub(computerClubDTO);
-
-        return new ComputerClubDTO(updatedComputerClub);
-
+        return computerClubService.updateComputerClub(updateComputerClubDTO);
     }
 
     @DeleteMapping("/computerclub/{id}")
-    public long deleteComputerClubById(@PathVariable long id){
-
+    public long deleteComputerClubById(@PathVariable @Min(value = 1, message = "минимальный id = 1") long id){
         computerClubService.deleteComputerClubById(id);
-
         return id;
 
     }
 
 
-    @GetMapping("/computerclub/workstations/{id}")//получить все доступные рабочие станции по клуба по айди
-    public Set<Workstation> getWorkstationsByCompClubId(@PathVariable long id){
-
-        Set<Workstation> workstations = computerClubService.getWorkstationsByCompClubId(id);
-        return workstations;
-    }
+//    @GetMapping("/computerclub/workstations/{id}")//получить все доступные рабочие станции по клуба по айди
+//    public Set<WorkstationResponseDTO> getWorkstationsByCompClubId(@PathVariable Long id){
+//
+//        return computerClubService.getWorkstationsByCompClubId(id);;
+//    }
 
 
 }

@@ -1,12 +1,15 @@
 package com.sber.stepanyan.compclub.service;
 
-import com.sber.stepanyan.compclub.DTO.MonitorDTO;
+import com.sber.stepanyan.compclub.DTO.MonitorDTO.AddMonitorDTO;
+import com.sber.stepanyan.compclub.DTO.MonitorDTO.MonitorResponseDTO;
+import com.sber.stepanyan.compclub.DTO.MonitorDTO.UpdateMonitorDTO;
 import com.sber.stepanyan.compclub.entity.Monitor;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.MonitorRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,117 +23,98 @@ public class MonitorService {
     }
 
 
-    public List<Monitor> getAllMonitors() {
+    public List<MonitorResponseDTO> getAllMonitors() {
 
         List<Monitor> monitorList = monitorRepository.findAll();
-        if (monitorList.isEmpty())
+        if (monitorList.isEmpty()){
             throw new EmptyDataException("Список мониторов пуст");
+        }
 
-        return monitorList;
+        List<MonitorResponseDTO> monitorResponseDTOList = new ArrayList<>();
+        for (Monitor m : monitorList) {
+            monitorResponseDTOList.add(new MonitorResponseDTO(m));
+        }
+
+        return monitorResponseDTOList;
     }
 
-    public long addMonitor(MonitorDTO monitorDTO) {
 
-        checkValuesForNull(monitorDTO);
-        Monitor monitor = checkValuesForCorrectness(monitorDTO, new Monitor());
+    public MonitorResponseDTO getMonitorById(Long id) {
+
+        return new MonitorResponseDTO(findMonitorById(id));
+    }
+
+    public Monitor findMonitorById(Long monitorId) {
+        Optional<Monitor> monitorOptional = monitorRepository.findById(monitorId);
+        if (monitorOptional.isEmpty()){
+            throw new EmptyDataException("Монитора с id = " + monitorId + " не существует");
+        }
+
+        return monitorOptional.get();
+    }
+
+    public long addMonitor(AddMonitorDTO addMonitorDTO) {
+
+        Monitor monitor = checkValuesForCorrectness(addMonitorDTO, new Monitor());
 
         Monitor addedMonitor = monitorRepository.save(monitor);
         return addedMonitor.getId();
 
     }
 
+    public MonitorResponseDTO updateMonitor(UpdateMonitorDTO updateMonitorDTO) {
 
+        Optional<Monitor> monitorOptional = monitorRepository.findById(updateMonitorDTO.getId());
+        if (monitorOptional.isEmpty()){
+            throw new EmptyDataException("Не найден монитор по id = " + updateMonitorDTO.getId());
+        }
+
+        Monitor updatedMonitor = checkValuesForCorrectness(updateMonitorDTO, monitorOptional.get());
+        monitorRepository.save(updatedMonitor);
+
+        return new MonitorResponseDTO(updatedMonitor) ;
+    }
 
 
     public void deleteMonitorById(long id) {
         monitorRepository.deleteById(id);
     }
 
-    public Monitor getMonitorById(long id) {
 
-        Optional<Monitor> monitor = monitorRepository.findById(id);
-        if (monitor.isEmpty())
-            throw new EmptyDataException("Монитора с id = " + id + " не существует");
 
-        return monitor.get();
 
+    private Monitor checkValuesForCorrectness(AddMonitorDTO addMonitorDTO, Monitor monitor) {
+
+            monitor.setBrand(addMonitorDTO.getBrand());
+            monitor.setModel(addMonitorDTO.getModel());
+            monitor.setRefershRate(addMonitorDTO.getRefershRate());
+            monitor.setPricePerHour(addMonitorDTO.getPricePerHour());
+            monitor.setResolution(addMonitorDTO.getResolution());
+
+        return monitor;
     }
 
 
-    public Monitor updateMonitor(MonitorDTO monitorDTO) {
-
-        if (monitorDTO.getId() == null) throw new EmptyDataException("не указан id монитора");
-
-        Optional<Monitor> monitorOptional = monitorRepository.findById(monitorDTO.getId());
-
-        if (monitorOptional.isEmpty())
-            throw new EmptyDataException("Не найден монитор по id = " + monitorDTO.getId());
-
-        Monitor updatedMonitor = checkValuesForCorrectness(monitorDTO, monitorOptional.get());
-        monitorRepository.save(updatedMonitor);
-
-        return updatedMonitor;
-    }
-
-    void checkValuesForNull(MonitorDTO monitorDTO){
-        //как это лучше можно сделать?
-        //save() выкидывает общую ошибку
-        if (monitorDTO.getBrand() == null)
-            throw new EmptyDataException("Не указан бренд монитора");
-        else if (monitorDTO.getModel() == null)
-            throw new EmptyDataException("Не указана модель монитора");
-        else if (monitorDTO.getRefershRate() == null)
-            throw new EmptyDataException("Не указана частота обновления монитора");
-        else if (monitorDTO.getPricePerHour() == null)
-            throw new EmptyDataException("Не указана стоимость за час монитора");
-        else if (monitorDTO.getResolution() == null)
-            throw new EmptyDataException("Не указано разрешение монитора");
-    }
-
-    private Monitor checkValuesForCorrectness(MonitorDTO monitorDTO, Monitor monitor) {
-        if (monitorDTO.getBrand() != null){
-            if (monitorDTO.getBrand().length() >= 2 || monitorDTO.getBrand().length() <= 20)
-                monitor.setBrand(monitorDTO.getBrand());
-            else throw new InvalidValuesException("Длина поля Бренд должна быть от 2 до 20 символов");
+    private Monitor checkValuesForCorrectness(UpdateMonitorDTO updateMonitorDTO, Monitor monitor) {
+        if (updateMonitorDTO.getBrand() != null){
+            monitor.setBrand(updateMonitorDTO.getBrand());
         }
+        if (updateMonitorDTO.getModel() != null){
 
-        if (monitorDTO.getModel() != null){
-            if (monitorDTO.getModel().length() >= 2 || monitorDTO.getModel().length() <= 30)
-                monitor.setModel(monitorDTO.getModel());
-            else throw new InvalidValuesException("Длина поля Модель должна быть от 2 до 30 символов");
+            monitor.setModel(updateMonitorDTO.getModel());
         }
-
-        if (monitorDTO.getRefershRate() != null){
-            if (monitorDTO.getRefershRate() >= 10 || monitorDTO.getRefershRate() <= 300)
-                monitor.setRefershRate(monitorDTO.getRefershRate());
-            else throw new InvalidValuesException("Частота обновления монитора должна быть от 10 до 300 Hz");
+        if (updateMonitorDTO.getRefershRate() != null){
+            monitor.setRefershRate(updateMonitorDTO.getRefershRate());
         }
-
-        if (monitorDTO.getPricePerHour() != null){
-            if (monitorDTO.getPricePerHour() >= 100 || monitorDTO.getPricePerHour() <= 300)
-                monitor.setPricePerHour(monitorDTO.getPricePerHour());
-            else throw new InvalidValuesException("Стоимость за час монитора должна быть от 100 до 300р ");
+        if (updateMonitorDTO.getPricePerHour() != null){
+            monitor.setPricePerHour(updateMonitorDTO.getPricePerHour());
         }
-
-        if (monitorDTO.getResolution() != null){
-            if (monitorDTO.getResolution().length() >= 6 || monitorDTO.getResolution().length() <= 30)
-                monitor.setResolution(monitorDTO.getResolution());
-            else throw new InvalidValuesException("Разрешение монитора должна быть от 6 до 30 символов ");
+        if (updateMonitorDTO.getResolution() != null){
+            monitor.setResolution(updateMonitorDTO.getResolution());
         }
 
         return monitor;
     }
 
-    //    private void checkValuesForCorrectness(MonitorDTO monitorDTO) {
-//        if (monitorDTO.getBrand() != null && (monitorDTO.getBrand().length() < 2 || monitorDTO.getBrand().length() > 20))
-//            throw new InvalidValuesException("Длина поля Бренд должна быть от 2 до 20 символов");
-//        if (monitorDTO.getModel() != null && (monitorDTO.getModel().length() < 2 || monitorDTO.getModel().length() > 30))
-//            throw new InvalidValuesException("Длина поля Модель должна быть от 2 до 30 символов");
-//        if (monitorDTO.getRefershRate() != null && (monitorDTO.getRefershRate() < 10 || monitorDTO.getRefershRate() > 300))
-//            throw new InvalidValuesException("Частота обновления монитора должна быть от 10 до 300 Hz");
-//        if (monitorDTO.getPricePerHour() != null && (monitorDTO.getPricePerHour() < 100 || monitorDTO.getPricePerHour() > 300))
-//            throw new InvalidValuesException("Стоимость за час монитора должна быть от 100 до 300р ");
-//        if (monitorDTO.getResolution() != null && (monitorDTO.getResolution().length() < 6 || monitorDTO.getResolution().length() > 30))
-//            throw new InvalidValuesException("Разрешение монитора должна быть от 6 до 30 символов ");
-//    }
+
 }

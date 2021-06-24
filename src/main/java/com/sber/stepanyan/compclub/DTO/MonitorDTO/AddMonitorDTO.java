@@ -1,25 +1,37 @@
-package com.sber.stepanyan.compclub.DTO;
+package com.sber.stepanyan.compclub.DTO.MonitorDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sber.stepanyan.compclub.entity.Monitor;
 
-public class MonitorDTO {
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+public class AddMonitorDTO {
 
 
-    private Long id;
-
+    @Size(min = 2, max = 20, message = "brand должен быть от 2 до 20 символов")
+    @NotBlank(message = "brand не должен быть пустым")
     private String brand;
+    @Size(min = 2, max = 40, message = "model должен быть от 2 до 40 символов")
+    @NotBlank(message = "model не должен быть пустым")
     private String model;
+    @Size(min = 6, max = 30, message = "resolution должен быть от 6 до 30 символов")
+    @NotBlank(message = "resolution не должен быть пустым")
     private String resolution;
+    @Min(value = 10, message = "минимальный refershRate = 10")
+    @Max(value = 400, message = "максимальный refershRate = 400")
     private Integer refershRate;
+    @Min(value = 50, message = "минимальный pricePerHour = 50")
+    @Max(value = 200, message = "максимальный pricePerHour = 200")
     private Double pricePerHour;
 
 
-    public MonitorDTO() {
+    public AddMonitorDTO() {
     }
 
-    public MonitorDTO(Monitor monitor) {
-        this.id = monitor.getId();
+    public AddMonitorDTO(Monitor monitor) {
         this.brand = monitor.getBrand();
         this.model = monitor.getModel();
         this.resolution = monitor.getResolution();
@@ -27,8 +39,7 @@ public class MonitorDTO {
         this.pricePerHour = monitor.getPricePerHour();
     }
 
-    public MonitorDTO(Long id, String brand, String model, String resolution, Integer refershRate, Double pricePerHour) {
-        this.id = id;
+    public AddMonitorDTO(Long id, String brand, String model, String resolution, Integer refershRate, Double pricePerHour) {
         this.brand = brand;
         this.model = model;
         this.resolution = resolution;
@@ -36,14 +47,6 @@ public class MonitorDTO {
         this.pricePerHour = pricePerHour;
     }
 
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public String getBrand() {
         return brand;

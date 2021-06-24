@@ -32,7 +32,7 @@ public class ComputerClub {
         }
         workstations.add(workstation);
         workstation.setComputerClub(this);
-    }
+    }//вывести в сервис
 
     public ComputerClub() {
     }

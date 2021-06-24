@@ -1,7 +1,9 @@
 package com.sber.stepanyan.compclub.service;
 
-import com.sber.stepanyan.compclub.DTO.SystemUnitDTO;
-import com.sber.stepanyan.compclub.entity.Monitor;
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.UpdateComputerClubDTO;
+import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.SystemUnitResponseDTO;
+import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.UpdateSystemUnitDTO;
+import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.addSystemUnitDTO;
 import com.sber.stepanyan.compclub.entity.SystemUnit;
 import com.sber.stepanyan.compclub.entity.SystemUnitPower;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
@@ -9,6 +11,7 @@ import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.SystemUnitRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -23,68 +26,96 @@ public class SystemUnitService {
     }
 
 
-    public List<SystemUnit> getAllSystemUnits() {
+    public List<SystemUnitResponseDTO> getAllSystemUnits() {
 
         List<SystemUnit> systemUnits = systemUnitRepository.findAll();
-        if (systemUnits.isEmpty())
+        if (systemUnits.isEmpty()){
             throw new EmptyDataException("Список системных блоков пуст");
+        }
 
-        return systemUnits;
+        List<SystemUnitResponseDTO> systemUnitResponseDTOList = new ArrayList<>();
+
+        for (SystemUnit s : systemUnits) {
+            systemUnitResponseDTOList.add(new SystemUnitResponseDTO(s));
+        }
+
+
+        return systemUnitResponseDTOList;
 
     }
 
-    public SystemUnit getSystemUnitById(long id) {
+    public SystemUnitResponseDTO getSystemUnitById(Long id) {
+        return new SystemUnitResponseDTO(findSystemUnitById(id));
+    }
 
-        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(id);
-        if (systemUnitOptional.isEmpty())
-            throw new EmptyDataException("Не найден системный блок с id = " + id);
-
+    public SystemUnit findSystemUnitById(Long computerClubId) {
+        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(computerClubId);
+        if (systemUnitOptional.isEmpty()){
+            throw new EmptyDataException("Не найден системный блок с id = " + computerClubId);
+        }
         return systemUnitOptional.get();
 
     }
 
-    public long addSystemUnit(SystemUnitDTO systemUnitDTO) {
+    public Long addSystemUnit(addSystemUnitDTO addSystemUnitDTO) {
 
-        checkValuesForNull(systemUnitDTO);
-        SystemUnit systemUnit = checkValuesForCorrectness(systemUnitDTO, new SystemUnit());
-
+        SystemUnit systemUnit = checkValuesForCorrectness(addSystemUnitDTO, new SystemUnit());
         SystemUnit addedSystemUnit = systemUnitRepository.save(systemUnit);
 
         return addedSystemUnit.getId();
 
     }
 
-    private SystemUnit checkValuesForCorrectness(SystemUnitDTO systemUnitDTO, SystemUnit systemUnit) {
 
-        if (systemUnitDTO.getCpu() != null){
-            if (systemUnitDTO.getCpu().length() >= 3 && systemUnitDTO.getCpu().length() <= 20)
-                systemUnit.setCpu(systemUnitDTO.getCpu());
-            else throw new InvalidValuesException("Длина поля CPU должна быть от 3 до 20 символов");
+    public SystemUnitResponseDTO updateSystemUnit(UpdateSystemUnitDTO updateSystemUnitDTO) {
+
+        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(updateSystemUnitDTO.getId());
+        if (systemUnitOptional.isEmpty()){
+            throw new EmptyDataException("Не найден системный блок с id = " + updateSystemUnitDTO.getId());
         }
 
-        if (systemUnitDTO.getCraphicsCard() != null){
-            if (systemUnitDTO.getCraphicsCard().length() >= 3 && systemUnitDTO.getCraphicsCard().length() <= 20)
-                systemUnit.setCraphicsCard(systemUnitDTO.getCraphicsCard());
-            else throw new InvalidValuesException("Длина поля CraphicsCard должна быть от 3 до 20 символов");
-        }
+        SystemUnit updatedSystemUnit = checkValuesForCorrectness(updateSystemUnitDTO, systemUnitOptional.get());
 
-        if (systemUnitDTO.getRam() != null){
-            if (systemUnitDTO.getRam() >= 2 && systemUnitDTO.getRam() <= 256)
-                systemUnit.setRam(systemUnitDTO.getRam());
-            else throw new InvalidValuesException("Ram должен быть от 2 до 256Гб");
-        }
+        systemUnitRepository.save(updatedSystemUnit);
 
-        if (systemUnitDTO.getPricePerHour() != null){
-            if (systemUnitDTO.getPricePerHour() >= 100 && systemUnitDTO.getPricePerHour() <= 500)
-                systemUnit.setPricePerHour(systemUnitDTO.getPricePerHour());
-            else throw new InvalidValuesException("Стоимость часа системного блока должна быть от 100 до 500р");
-        }
-        if (systemUnitDTO.getPower() != null){
+        return new SystemUnitResponseDTO(updatedSystemUnit);
+    }
 
-           // SystemUnitPower.valueOf(systemUnitDTO.getPower().name());
+    public void deleteSystemUnitById(long id) {
+        systemUnitRepository.deleteById(id);
+    }
 
+    private SystemUnit checkValuesForCorrectness(addSystemUnitDTO systemUnitDTO, SystemUnit systemUnit) {
+
+            systemUnit.setCpu(systemUnitDTO.getCpu());
+            systemUnit.setCraphicsCard(systemUnitDTO.getCraphicsCard());
+            systemUnit.setRam(systemUnitDTO.getRam());
+            systemUnit.setPricePerHour(systemUnitDTO.getPricePerHour());
             if (SystemUnitPower.contains(systemUnitDTO.getPower().name())){
                 systemUnit.setPower(systemUnitDTO.getPower());
+            }
+            else throw new InvalidValuesException("Допустымые значения для Power " + Arrays.toString(SystemUnitPower.values()));
+
+        return systemUnit;
+    }
+
+    private SystemUnit checkValuesForCorrectness(UpdateSystemUnitDTO updateSystemUnitDTO, SystemUnit systemUnit) {
+
+        if (updateSystemUnitDTO.getCpu() != null){
+            systemUnit.setCpu(updateSystemUnitDTO.getCpu());
+        }
+        if (updateSystemUnitDTO.getCraphicsCard() != null){
+            systemUnit.setCraphicsCard(updateSystemUnitDTO.getCraphicsCard());
+        }
+        if (updateSystemUnitDTO.getRam() != null){
+            systemUnit.setRam(updateSystemUnitDTO.getRam());
+        }
+        if (updateSystemUnitDTO.getPricePerHour() != null){
+            systemUnit.setPricePerHour(updateSystemUnitDTO.getPricePerHour());
+        }
+        if (updateSystemUnitDTO.getPower() != null){
+            if (SystemUnitPower.contains(updateSystemUnitDTO.getPower().name())){
+                systemUnit.setPower(updateSystemUnitDTO.getPower());
             }
             else throw new InvalidValuesException("Допустымые значения для Power " + Arrays.toString(SystemUnitPower.values()));
         }
@@ -92,36 +123,6 @@ public class SystemUnitService {
         return systemUnit;
     }
 
-    private void checkValuesForNull(SystemUnitDTO systemUnitDTO) {
-        if (systemUnitDTO.getCpu() == null)
-            throw new EmptyDataException("Не указан процессор системного блока");
-        else if (systemUnitDTO.getCraphicsCard() == null)
-            throw new EmptyDataException("Не указана видеокарта системного блока");
-        else if (systemUnitDTO.getPricePerHour() == null)
-            throw new EmptyDataException("Не указана цена за час системного блока");
-        else if (systemUnitDTO.getRam() == null)
-            throw new EmptyDataException("Не указана оперативная память системного блока");
-        else if (systemUnitDTO.getPower() == null)
-            throw new EmptyDataException("Не указана мощность системного блока");
-    }
 
 
-
-    public SystemUnit updateSystemUnit(SystemUnitDTO systemUnitDTO) {
-
-        if (systemUnitDTO.getId() == null) throw new EmptyDataException("не указан id системного блока");
-        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(systemUnitDTO.getId());
-        if (systemUnitOptional.isEmpty())
-            throw new EmptyDataException("Не найден системный блок с id = " + systemUnitDTO.getId());
-
-        SystemUnit updatedSystemUnit = checkValuesForCorrectness(systemUnitDTO, systemUnitOptional.get());
-
-        systemUnitRepository.save(updatedSystemUnit);
-
-        return updatedSystemUnit;
-    }
-
-    public void deleteSystemUnitById(long id) {
-        systemUnitRepository.deleteById(id);
-    }
 }

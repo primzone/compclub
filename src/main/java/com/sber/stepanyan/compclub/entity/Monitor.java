@@ -1,6 +1,6 @@
 package com.sber.stepanyan.compclub.entity;
 
-import com.sber.stepanyan.compclub.DTO.MonitorDTO;
+import com.sber.stepanyan.compclub.DTO.MonitorDTO.AddMonitorDTO;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -35,7 +35,7 @@ public class Monitor {
     public Monitor() {
     }
 
-    public Monitor(MonitorDTO monitorDTO) {
+    public Monitor(AddMonitorDTO monitorDTO) {
         this.brand = monitorDTO.getBrand();
         this.model = monitorDTO.getModel();
         this.resolution = monitorDTO.getResolution();

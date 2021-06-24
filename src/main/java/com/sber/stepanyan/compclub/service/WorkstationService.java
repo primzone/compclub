@@ -1,15 +1,19 @@
 package com.sber.stepanyan.compclub.service;
 
-import com.sber.stepanyan.compclub.DTO.WorkstationDTO.WorkstationDTO;
-import com.sber.stepanyan.compclub.entity.ComputerClub;
-import com.sber.stepanyan.compclub.entity.Monitor;
-import com.sber.stepanyan.compclub.entity.SystemUnit;
+import com.sber.stepanyan.compclub.DTO.WorkstationDTO.AddWorkstationDTO;
+import com.sber.stepanyan.compclub.DTO.WorkstationDTO.UpdateWorkstationDTO;
+import com.sber.stepanyan.compclub.DTO.WorkstationDTO.WorkstationResponseDTO;
+import com.sber.stepanyan.compclub.entity.Order;
+import com.sber.stepanyan.compclub.entity.Schedule;
 import com.sber.stepanyan.compclub.entity.Workstation;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.repository.WorkstationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,94 +24,135 @@ public class WorkstationService {
     final MonitorService monitorService;
     final SystemUnitService systemUnitService;
     final WorkstationRepository workstationRepository;
+    final ScheduleService scheduleService;
 
-    public WorkstationService(WorkstationRepository workstationRepository, ComputerClubService computerClubService, MonitorService monitorService, SystemUnitService systemUnitService) {
+    public WorkstationService(WorkstationRepository workstationRepository, ComputerClubService computerClubService, MonitorService monitorService, SystemUnitService systemUnitService, ScheduleService scheduleService) {
         this.workstationRepository = workstationRepository;
         this.computerClubService = computerClubService;
         this.monitorService = monitorService;
         this.systemUnitService = systemUnitService;
+        this.scheduleService = scheduleService;
     }
 
 
-    public List<Workstation> getAllWorkstations() {
+    public List<WorkstationResponseDTO> getAllWorkstations() {
 
         List<Workstation> workstations = workstationRepository.findAll();
-
-        if (workstations.isEmpty())
+        if (workstations.isEmpty()){
             throw new EmptyDataException("Список рабочих станций пуст");
-        return workstations;
+        }
+
+        List<WorkstationResponseDTO> workstationResponseDTOList = new ArrayList<>();
+        for (Workstation w : workstations) {
+            workstationResponseDTOList.add(new WorkstationResponseDTO(w));
+        }
+
+        return workstationResponseDTOList;
     }
 
-    public Workstation getWorkstationById(long id) {
+    public WorkstationResponseDTO getWorkstationById(Long id) {
+        return new WorkstationResponseDTO(findWorkstationById(id));
+    }
+
+    private Workstation findWorkstationById(Long id) {
 
         Optional<Workstation> workstationOptional = workstationRepository.findById(id);
-
-        if (workstationOptional.isEmpty())
+        if (workstationOptional.isEmpty()){
             throw new EmptyDataException("Не найдена рабочая станция с id = " + id);
-
+        }
         return workstationOptional.get();
-
     }
 
-    public long addWorkstation(WorkstationDTO workstationDTO) {
+    public Long addWorkstation(AddWorkstationDTO addWorkstationDTO) {
 
-        checkValuesForNull(workstationDTO);
-        Workstation addedWorkstation = checkValuesForCorrectness(workstationDTO, new Workstation());
-
+        Workstation addedWorkstation = checkValuesForCorrectness(addWorkstationDTO, new Workstation());
         workstationRepository.save(addedWorkstation);
 
         return addedWorkstation.getId();
-
     }
 
-    private Workstation checkValuesForCorrectness(WorkstationDTO workstationDTO, Workstation workstation) {
-        if (workstationDTO.getWorkstationNumber() != null){
-            if (workstationDTO.getWorkstationNumber() > 0 ){
-                if (workstationRepository.findWorkstationByWorkstationNumber(workstationDTO.getWorkstationNumber()).isPresent())
-                        throw new InvalidValuesException("Workstation с таким номером уже существует");
-                workstation.setWorkstationNumber(workstationDTO.getWorkstationNumber());
-            } else throw new InvalidValuesException("Номер workstation должен быть больше 0");
+    public WorkstationResponseDTO updateWorkstation(UpdateWorkstationDTO updateWorkstationDTO) {
+
+        Workstation workstation = findWorkstationById(updateWorkstationDTO.getId());
+        Workstation updatedWorkstation = checkValuesForCorrectness(updateWorkstationDTO, workstation);
+
+        workstationRepository.save(updatedWorkstation);
+
+        return new WorkstationResponseDTO(updatedWorkstation);
+    }
+
+
+
+    public void deleteWorkstation(Long id) {
+        workstationRepository.deleteById(id);
+    }
+
+
+    private Workstation checkValuesForCorrectness(AddWorkstationDTO addWorkstationDTO, Workstation workstation) {
+
+        if (workstationRepository.findWorkstationByWorkstationNumber(addWorkstationDTO.getWorkstationNumber()).isPresent()){
+            throw new InvalidValuesException("Workstation с таким номером уже существует");
         }
 
-        if (workstationDTO.getComputerClubId() != null)
-            workstation.setComputerClub(computerClubService.getComputerClubById(workstationDTO.getComputerClubId()));
-
-        if (workstationDTO.getMonitorId() != null)
-            workstation.setMonitor(monitorService.getMonitorById(workstationDTO.getMonitorId()));
-
-        if (workstationDTO.getSystemUnitId() != null)
-            workstation.setSystemUnit(systemUnitService.getSystemUnitById(workstationDTO.getComputerClubId()));
+        workstation.setWorkstationNumber(addWorkstationDTO.getWorkstationNumber());
+        workstation.setComputerClub(computerClubService.findComputerClubById(addWorkstationDTO.getComputerClubId()));
+        workstation.setMonitor(monitorService.findMonitorById(addWorkstationDTO.getMonitorId()));
+        workstation.setSystemUnit(systemUnitService.findSystemUnitById(addWorkstationDTO.getComputerClubId()));
 
         return workstation;
     }
 
-    private void checkValuesForNull(WorkstationDTO workstationDTO) {
-        if (workstationDTO.getWorkstationNumber() == null)
-            throw new EmptyDataException("не указан номер workstation");
-        if (workstationDTO.getComputerClubId() == null)
-            throw new EmptyDataException("не указан id компьютерного клуба");
-        if (workstationDTO.getMonitorId() == null)
-            throw new EmptyDataException("не указан id монитора");
-        if (workstationDTO.getSystemUnitId() == null)
-            throw new EmptyDataException("не указан id системного блока");
+
+    private Workstation checkValuesForCorrectness(UpdateWorkstationDTO updateWorkstationDTO, Workstation workstation) {
+
+        if (updateWorkstationDTO.getWorkstationNumber() != null){
+            if (workstationRepository.findWorkstationByWorkstationNumber(updateWorkstationDTO.getWorkstationNumber()).isPresent()){
+                throw new InvalidValuesException("Workstation с таким номером уже существует");
+            }
+            workstation.setWorkstationNumber(updateWorkstationDTO.getWorkstationNumber());
+        }
+        if (updateWorkstationDTO.getComputerClubId() != null){
+            workstation.setComputerClub(computerClubService.findComputerClubById(updateWorkstationDTO.getComputerClubId()));
+        }
+        if (updateWorkstationDTO.getMonitorId() != null){
+            workstation.setMonitor(monitorService.findMonitorById(updateWorkstationDTO.getMonitorId()));
+        }
+        if (updateWorkstationDTO.getSystemUnitId() != null){
+            workstation.setSystemUnit(systemUnitService.findSystemUnitById(updateWorkstationDTO.getComputerClubId()));
+        }
+
+        return workstation;
     }
 
 
-    public void deleteWorkstation(long id) {
-        workstationRepository.deleteById(id);
+    public Workstation findWorkstationByWorkstationNumber(Integer workstationNumber) {
+
+        Optional<Workstation> workstationOptional = workstationRepository.findWorkstationByWorkstationNumber(workstationNumber);
+        if (workstationOptional.isEmpty()){
+            throw new EmptyDataException("Workstation с номером = " + workstationNumber + " не существует");
+        }
+
+
+        return workstationOptional.get();
     }
 
-    public Workstation updateWorkstation(WorkstationDTO workstationDTO) {
+    //проверка расписания
+    public void checkScheduleForWorkstation(Workstation workstation, Schedule schedule) {
 
-        if (workstationDTO.getId() == null) throw new EmptyDataException("не указан id workstation");
-        Workstation workstation = getWorkstationById(workstationDTO.getId());
+        for (Schedule s : workstation.getSchedules()) {
+            scheduleService.checkSchedules(schedule, s);
+        }
 
-        Workstation updatedWorkstation = checkValuesForCorrectness(workstationDTO, workstation);
+    }
 
-        //ДОДЕЛАТЬ
-        workstationRepository.save(updatedWorkstation);
 
-        return updatedWorkstation;
+    public void addOrderToWorkstation(Workstation workstation, Order order) {
+
+        if (workstation.getOrders() == null){
+            workstation.setOrders(new HashSet<>());
+        }
+        workstation.getOrders().add(order);
+        order.setWorkstation(workstation);
 
     }
 }

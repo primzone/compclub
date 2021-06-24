@@ -1,13 +1,15 @@
-package com.sber.stepanyan.compclub.DTO;
+package com.sber.stepanyan.compclub.DTO.SystemUnitDTO;
 
 import com.sber.stepanyan.compclub.entity.SystemUnit;
 import com.sber.stepanyan.compclub.entity.SystemUnitPower;
 
-import javax.persistence.Column;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
-public class SystemUnitDTO {
+public class SystemUnitResponseDTO {
+
 
     private Long id;
     private String cpu;
@@ -16,10 +18,10 @@ public class SystemUnitDTO {
     private SystemUnitPower power;
     private Double pricePerHour;
 
-    public SystemUnitDTO() {
+    public SystemUnitResponseDTO() {
     }
 
-    public SystemUnitDTO(SystemUnit systemUnit) {
+    public SystemUnitResponseDTO(SystemUnit systemUnit) {
         this.id = systemUnit.getId();
         this.cpu = systemUnit.getCpu();
         this.craphicsCard = systemUnit.getCraphicsCard();
@@ -28,7 +30,7 @@ public class SystemUnitDTO {
         this.pricePerHour = systemUnit.getPricePerHour();
     }
 
-    public SystemUnitDTO(Long id, String cpu, String craphicsCard, Integer ram, SystemUnitPower power, Double pricePerHour) {
+    public SystemUnitResponseDTO(Long id, String cpu, String craphicsCard, Integer ram, SystemUnitPower power, Double pricePerHour) {
         this.id = id;
         this.cpu = cpu;
         this.craphicsCard = craphicsCard;
