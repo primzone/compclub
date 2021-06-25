@@ -19,16 +19,15 @@ import java.sql.Timestamp;
 public class AddOrderDTO {
 
     @Pattern(regexp = "\\d{12}", message = "accountNumber должен состоять из 12 цифр")
-    @NotBlank(message = "accountNumber не должен быть пустым")
+    //@NotBlank(message = "accountNumber не должен быть пустым")
     private String accountNumber;
     @Min(value = 1, message = "минимальный workstationNumber = 1")
     @Max(value = Integer.MAX_VALUE, message = "максимальный workstationNumber = " + Integer.MAX_VALUE)
-    @NotEmpty(message = "workstationNumber не должен быть пустым")
+    //@NotEmpty(message = "workstationNumber не должен быть пустым")
     private Integer workstationNumber;
 
-
-    private Timestamp start;
-    private Timestamp end;
+    private Long start;
+    private Long end;
 
 
     public AddOrderDTO() {
@@ -50,19 +49,19 @@ public class AddOrderDTO {
         this.workstationNumber = workstationNumber;
     }
 
-    public Timestamp getStart() {
+    public Long getStart() {
         return start;
     }
 
-    public void setStart(Timestamp start) {
+    public void setStart(Long start) {
         this.start = start;
     }
 
-    public Timestamp getEnd() {
+    public Long getEnd() {
         return end;
     }
 
-    public void setEnd(Timestamp end) {
+    public void setEnd(Long end) {
         this.end = end;
     }
 }

@@ -5,10 +5,12 @@ import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.SystemUnitResponseDTO;
 import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.UpdateSystemUnitDTO;
 import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.addSystemUnitDTO;
 import com.sber.stepanyan.compclub.entity.SystemUnit;
-import com.sber.stepanyan.compclub.entity.SystemUnitPower;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
-import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
+import com.sber.stepanyan.compclub.kafka.KafkaProducerService;
 import com.sber.stepanyan.compclub.repository.SystemUnitRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,10 +21,14 @@ import java.util.Optional;
 @Service
 public class SystemUnitService {
 
+    private static final Logger log = LoggerFactory.getLogger(SystemUnitService.class);
     final SystemUnitRepository systemUnitRepository;
 
-    public SystemUnitService(SystemUnitRepository systemUnitRepository) {
+    final KafkaProducerService kafkaProducerService;
+
+    public SystemUnitService(SystemUnitRepository systemUnitRepository, KafkaProducerService kafkaProducerService) {
         this.systemUnitRepository = systemUnitRepository;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
 
@@ -30,6 +36,7 @@ public class SystemUnitService {
 
         List<SystemUnit> systemUnits = systemUnitRepository.findAll();
         if (systemUnits.isEmpty()){
+            log.info("Список системных блоков пуст");
             throw new EmptyDataException("Список системных блоков пуст");
         }
 
@@ -39,20 +46,23 @@ public class SystemUnitService {
             systemUnitResponseDTOList.add(new SystemUnitResponseDTO(s));
         }
 
-
+        log.info("Вернуть все системные блоки");
         return systemUnitResponseDTOList;
 
     }
 
     public SystemUnitResponseDTO getSystemUnitById(Long id) {
+        log.info("Вернуть системный блок по id [{}]", id);
         return new SystemUnitResponseDTO(findSystemUnitById(id));
     }
 
     public SystemUnit findSystemUnitById(Long computerClubId) {
         Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(computerClubId);
         if (systemUnitOptional.isEmpty()){
+            log.info("Не найден системный блок с id [{}]", computerClubId);
             throw new EmptyDataException("Не найден системный блок с id = " + computerClubId);
         }
+        log.info("Вернуть системный блок с id [{}]", systemUnitOptional.get().getId());
         return systemUnitOptional.get();
 
     }
@@ -61,7 +71,8 @@ public class SystemUnitService {
 
         SystemUnit systemUnit = checkValuesForCorrectness(addSystemUnitDTO, new SystemUnit());
         SystemUnit addedSystemUnit = systemUnitRepository.save(systemUnit);
-
+        log.info("Системный блок с id [{}] добавлен", systemUnit.getId());
+        kafkaProducerService.produce(new SystemUnitResponseDTO(addedSystemUnit));
         return addedSystemUnit.getId();
 
     }
@@ -69,15 +80,13 @@ public class SystemUnitService {
 
     public SystemUnitResponseDTO updateSystemUnit(UpdateSystemUnitDTO updateSystemUnitDTO) {
 
-        Optional<SystemUnit> systemUnitOptional = systemUnitRepository.findById(updateSystemUnitDTO.getId());
-        if (systemUnitOptional.isEmpty()){
-            throw new EmptyDataException("Не найден системный блок с id = " + updateSystemUnitDTO.getId());
-        }
+        SystemUnit systemUnit = findSystemUnitById(updateSystemUnitDTO.getId());
 
-        SystemUnit updatedSystemUnit = checkValuesForCorrectness(updateSystemUnitDTO, systemUnitOptional.get());
+        SystemUnit updatedSystemUnit = checkValuesForCorrectness(updateSystemUnitDTO, systemUnit);
 
         systemUnitRepository.save(updatedSystemUnit);
-
+        log.info("Системный блок с id");
+        kafkaProducerService.produce(new SystemUnitResponseDTO(updatedSystemUnit));
         return new SystemUnitResponseDTO(updatedSystemUnit);
     }
 
@@ -91,10 +100,6 @@ public class SystemUnitService {
             systemUnit.setCraphicsCard(systemUnitDTO.getCraphicsCard());
             systemUnit.setRam(systemUnitDTO.getRam());
             systemUnit.setPricePerHour(systemUnitDTO.getPricePerHour());
-            if (SystemUnitPower.contains(systemUnitDTO.getPower().name())){
-                systemUnit.setPower(systemUnitDTO.getPower());
-            }
-            else throw new InvalidValuesException("Допустымые значения для Power " + Arrays.toString(SystemUnitPower.values()));
 
         return systemUnit;
     }
@@ -113,12 +118,7 @@ public class SystemUnitService {
         if (updateSystemUnitDTO.getPricePerHour() != null){
             systemUnit.setPricePerHour(updateSystemUnitDTO.getPricePerHour());
         }
-        if (updateSystemUnitDTO.getPower() != null){
-            if (SystemUnitPower.contains(updateSystemUnitDTO.getPower().name())){
-                systemUnit.setPower(updateSystemUnitDTO.getPower());
-            }
-            else throw new InvalidValuesException("Допустымые значения для Power " + Arrays.toString(SystemUnitPower.values()));
-        }
+
 
         return systemUnit;
     }

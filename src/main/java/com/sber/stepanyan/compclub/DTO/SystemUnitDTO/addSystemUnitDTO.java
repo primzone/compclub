@@ -21,7 +21,6 @@ public class addSystemUnitDTO {
     @Max(value = 256, message = "максимальный ram = 256")
     @NotEmpty(message = "ram не должен быть пустым")
     private Integer ram;
-    private SystemUnitPower power;
     @Min(value = 100, message = "минимальный pricePerHour = 100")
     @Max(value = 500, message = "максимальный pricePerHour = 500")
     @NotEmpty(message = "pricePerHour не должен быть пустым")
@@ -34,7 +33,6 @@ public class addSystemUnitDTO {
         this.cpu = systemUnit.getCpu();
         this.craphicsCard = systemUnit.getCraphicsCard();
         this.ram = systemUnit.getRam();
-        this.power = systemUnit.getPower();
         this.pricePerHour = systemUnit.getPricePerHour();
     }
 
@@ -42,7 +40,6 @@ public class addSystemUnitDTO {
         this.cpu = cpu;
         this.craphicsCard = craphicsCard;
         this.ram = ram;
-        this.power = power;
         this.pricePerHour = pricePerHour;
     }
 
@@ -68,14 +65,6 @@ public class addSystemUnitDTO {
 
     public void setRam(Integer ram) {
         this.ram = ram;
-    }
-
-    public SystemUnitPower getPower() {
-        return power;
-    }
-
-    public void setPower(SystemUnitPower power) {
-        this.power = power;
     }
 
     public Double getPricePerHour() {

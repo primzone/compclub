@@ -5,6 +5,7 @@ import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.UpdateSystemUnitDTO;
 import com.sber.stepanyan.compclub.DTO.SystemUnitDTO.addSystemUnitDTO;
 import com.sber.stepanyan.compclub.entity.SystemUnit;
 import com.sber.stepanyan.compclub.service.SystemUnitService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,31 +32,36 @@ public class SystemUnitController {
         this.systemUnitService = systemUnitService;
     }
 
-    @GetMapping("/systemunits")//получить все доступные мониторы
+    @GetMapping("/systemunits")
+    @ApiOperation(value = "получить все системные блоки")
     public List<SystemUnitResponseDTO> getAllSystemUnits(){
 
         return systemUnitService.getAllSystemUnits();
     }
 
-    @GetMapping("/systemunits/{id}")//получить монитор по айди
+    @GetMapping("/systemunits/{id}")
+    @ApiOperation(value = "получить системный блок по id")
     public SystemUnitResponseDTO getSystemUnitById(@PathVariable @Min(1) Long id){
 
         return systemUnitService.getSystemUnitById(id);
     }
 
-    @PostMapping("/systemunits")//добавить монитор
+    @PostMapping("/systemunits")
+    @ApiOperation(value = "добавить системный блок")
     public Long addSystemUnit(@Valid @RequestBody addSystemUnitDTO systemUnitDTO){
 
         return systemUnitService.addSystemUnit(systemUnitDTO);
     }
 
-    @PutMapping("/systemunits")//изменить монитор
+    @PutMapping("/systemunits")
+    @ApiOperation(value = "изменить системный блок")
     public SystemUnitResponseDTO updateSystemUnit(@Valid @RequestBody UpdateSystemUnitDTO updateSystemUnitDTO){
 
         return systemUnitService.updateSystemUnit(updateSystemUnitDTO);
     }
 
-    @DeleteMapping("/systemunits/{id}")//удалить монитор
+    @DeleteMapping("/systemunits/{id}")
+    @ApiOperation(value = "удалить системный блок")
     public Long deleteSystemUnitById(@PathVariable @Min(1) Long id){
 
         systemUnitService.deleteSystemUnitById(id);

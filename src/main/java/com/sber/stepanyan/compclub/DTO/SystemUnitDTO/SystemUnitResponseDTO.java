@@ -15,7 +15,6 @@ public class SystemUnitResponseDTO {
     private String cpu;
     private String craphicsCard;
     private Integer ram;
-    private SystemUnitPower power;
     private Double pricePerHour;
 
     public SystemUnitResponseDTO() {
@@ -26,16 +25,14 @@ public class SystemUnitResponseDTO {
         this.cpu = systemUnit.getCpu();
         this.craphicsCard = systemUnit.getCraphicsCard();
         this.ram = systemUnit.getRam();
-        this.power = systemUnit.getPower();
         this.pricePerHour = systemUnit.getPricePerHour();
     }
 
-    public SystemUnitResponseDTO(Long id, String cpu, String craphicsCard, Integer ram, SystemUnitPower power, Double pricePerHour) {
+    public SystemUnitResponseDTO(Long id, String cpu, String craphicsCard, Integer ram, Double pricePerHour) {
         this.id = id;
         this.cpu = cpu;
         this.craphicsCard = craphicsCard;
         this.ram = ram;
-        this.power = power;
         this.pricePerHour = pricePerHour;
     }
 
@@ -71,13 +68,6 @@ public class SystemUnitResponseDTO {
         this.ram = ram;
     }
 
-    public SystemUnitPower getPower() {
-        return power;
-    }
-
-    public void setPower(SystemUnitPower power) {
-        this.power = power;
-    }
 
     public Double getPricePerHour() {
         return pricePerHour;

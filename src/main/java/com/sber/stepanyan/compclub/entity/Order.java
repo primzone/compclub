@@ -1,5 +1,6 @@
 package com.sber.stepanyan.compclub.entity;
 
+import javax.annotation.processing.Generated;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,9 +10,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "orders")
 public class Order {
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id")
@@ -21,18 +26,28 @@ public class Order {
     @Column(name = "count")
     private Double count;
     @Column(name = "paid")
-    private Boolean paid;
+    private Boolean paid = false;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "account_id")
     private Account account;
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
-    @JoinColumn(name = "workstation_id")
+    @JoinColumn(name = "workstatio_id")
     private Workstation workstation;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "schedule_id")
     private Schedule schedule;
 
     public Order() {
+    }
+
+    public Order(Long id, Long orderNumber, Double count, Boolean paid, Account account, Workstation workstation, Schedule schedule) {
+        this.id = id;
+        this.orderNumber = orderNumber;
+        this.count = count;
+        this.paid = paid;
+        this.account = account;
+        this.workstation = workstation;
+        this.schedule = schedule;
     }
 
     public Long getId() {

@@ -22,7 +22,6 @@ public class Account {
     @Column(name = "balance")
     private Double balance = 0.0;
     @OneToMany(mappedBy = "account")
-    @Column(name = "orders")
     private Set<Order> orders;
 
 

@@ -1,9 +1,11 @@
 package com.sber.stepanyan.compclub.controller;
 
+import com.sber.stepanyan.compclub.DTO.AccountDTO.AccountResponseDTO;
 import com.sber.stepanyan.compclub.DTO.AccountDTO.AddAccountDTO;
 import com.sber.stepanyan.compclub.DTO.AccountDTO.IncreaseBalance;
 import com.sber.stepanyan.compclub.entity.Account;
 import com.sber.stepanyan.compclub.service.AccountService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,12 +31,14 @@ public class AccountController {
     }
 
     @GetMapping("/account/{name}")//получить данные личного кабинета
-    public Account getAccountByName(@PathVariable @Size(min = 3, max = 30, message = "name должен быть от 3 до 30 символов") String name){
+    @ApiOperation(value = "Получить аккаунт по имени")
+    public AccountResponseDTO getAccountByName(@PathVariable @Size(min = 3, max = 30, message = "name должен быть от 3 до 30 символов") String name){
 
         return accountService.getAccountByName(name);
     }
 
     @PostMapping("/account")//добавить личный кабинет
+    @ApiOperation(value = "Добавить аккаунт")
     public Long addAccount(@RequestBody @Valid AddAccountDTO addAccountDTO){
 
         return accountService.addAccount(addAccountDTO);
@@ -42,6 +46,7 @@ public class AccountController {
     }
 
     @PutMapping ("/account")//пополнение баланса личного кабинета
+    @ApiOperation(value = "Пополнить счет аккаунта")
     public Long increaseBalanceByAccountNumber(@RequestBody @Valid IncreaseBalance increaseBalance){
 
         return accountService.increaseBalanceByAccountNumber(increaseBalance);
@@ -49,6 +54,7 @@ public class AccountController {
     }
 
     @DeleteMapping("/account/{id}")
+    @ApiOperation(value = "Удалить аккаунт")
     public Long deleteAccountById(@PathVariable Long id){
         accountService.deleteAccountById(id);
         return id;

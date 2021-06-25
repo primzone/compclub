@@ -1,12 +1,15 @@
 package com.sber.stepanyan.compclub.controller;
 
 import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.AddComputerClubDTO;
+import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.AddWorkstationToComputerClubDTO;
 import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.ComputerClubResponseDTO;
 import com.sber.stepanyan.compclub.DTO.ComputerClubDTO.UpdateComputerClubDTO;
 import com.sber.stepanyan.compclub.entity.ComputerClub;
 import com.sber.stepanyan.compclub.entity.Workstation;
 import com.sber.stepanyan.compclub.service.ComputerClubService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,50 +35,53 @@ public class ComputerClubController {
     final ComputerClubService computerClubService;
     final KafkaTemplate<String, String> kafkaTemplate;
 
-    private static final String TOPIC = "Kafka_New";
-
     @Autowired
     public ComputerClubController(ComputerClubService computerClubService, KafkaTemplate<String, String> kafkaTemplate) {
         this.computerClubService = computerClubService;
         this.kafkaTemplate = kafkaTemplate;
     }
 
-//    @GetMapping("/publish/{message}")
-//    public String printHello(@PathVariable("message") final String message){
-//
-//        kafkaTemplate.send(TOPIC, message);
-//        return "Successfully send to kafka";
-//    }
-
 
     @GetMapping("/computerclub")//получить все компьютерные клубы
+    @ApiOperation(value = "Получить все компьютерные клубы")
     public List<ComputerClubResponseDTO> getAllComputerClub(){
         return computerClubService.getAllComputerClub();
     }
 
     @GetMapping("/computerclub/{id}")//получить компьютерный клуб по айди
+    @ApiOperation(value = "получить компьютерный клуб по id")
     public ComputerClubResponseDTO getComputerClubById(@PathVariable @Min(value = 1, message = "минимальный id = 1") Long id){
         return computerClubService.getComputerClubById(id);
     }
 
-    @PostMapping("/computerclub")// добавить рабочую станцию клубу
+    @PostMapping("/computerclub")//
+    @ApiOperation(value = "добавить компьютерный клуб")
     public Long addComputerClub(@Valid @RequestBody AddComputerClubDTO addComputerClubDTO){
         return computerClubService.addComputerClub(addComputerClubDTO);
     }
 
-    @PutMapping("/computerclub")// изменить рабочую станцию клубу
+    @PutMapping("/computerclub")//
+    @ApiOperation(value = "изменить компьютерный клуб")
     public UpdateComputerClubDTO updateComputerClub(@Valid @RequestBody UpdateComputerClubDTO updateComputerClubDTO){
 
         return computerClubService.updateComputerClub(updateComputerClubDTO);
     }
 
     @DeleteMapping("/computerclub/{id}")
+    @ApiOperation(value = "удалить компьютерный клуб")
     public long deleteComputerClubById(@PathVariable @Min(value = 1, message = "минимальный id = 1") long id){
         computerClubService.deleteComputerClubById(id);
         return id;
 
     }
 
+    @PutMapping("/computerclub/addworkstation")
+    @ApiOperation(value = "добавить workstation к компьютерному клубу")
+    public ComputerClubResponseDTO addWorkstationToComputerClub(@Valid @RequestBody AddWorkstationToComputerClubDTO addWorkstationToComputerClubDTO){
+
+        return computerClubService.addWorkstationToComputerClub(addWorkstationToComputerClubDTO);
+
+    }
 
 //    @GetMapping("/computerclub/workstations/{id}")//получить все доступные рабочие станции по клуба по айди
 //    public Set<WorkstationResponseDTO> getWorkstationsByCompClubId(@PathVariable Long id){

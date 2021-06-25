@@ -6,7 +6,11 @@ import com.sber.stepanyan.compclub.DTO.MonitorDTO.UpdateMonitorDTO;
 import com.sber.stepanyan.compclub.entity.Monitor;
 import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
+import com.sber.stepanyan.compclub.kafka.KafkaProducerService;
 import com.sber.stepanyan.compclub.repository.MonitorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -16,10 +20,14 @@ import java.util.Optional;
 @Service
 public class MonitorService {
 
+    private static final Logger log = LoggerFactory.getLogger(MonitorService.class);
+    final KafkaProducerService kafkaProducerService;
+
     final MonitorRepository monitorRepository;
 
-    public MonitorService(MonitorRepository monitorRepository) {
+    public MonitorService(MonitorRepository monitorRepository, KafkaProducerService kafkaProducerService) {
         this.monitorRepository = monitorRepository;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
 
@@ -27,6 +35,7 @@ public class MonitorService {
 
         List<Monitor> monitorList = monitorRepository.findAll();
         if (monitorList.isEmpty()){
+            log.info("Список мониторов пуст");
             throw new EmptyDataException("Список мониторов пуст");
         }
 
@@ -35,21 +44,25 @@ public class MonitorService {
             monitorResponseDTOList.add(new MonitorResponseDTO(m));
         }
 
+        log.info("Вернуть список всех мониторов");
         return monitorResponseDTOList;
     }
 
 
     public MonitorResponseDTO getMonitorById(Long id) {
 
+        log.info("Вернуть монитор с id [{}]", id);
         return new MonitorResponseDTO(findMonitorById(id));
     }
 
     public Monitor findMonitorById(Long monitorId) {
         Optional<Monitor> monitorOptional = monitorRepository.findById(monitorId);
         if (monitorOptional.isEmpty()){
+            log.info("Монитора с id [{}] не существует", monitorId);
             throw new EmptyDataException("Монитора с id = " + monitorId + " не существует");
         }
 
+        log.info("Вернуть монитор с id [{}]", monitorOptional.get().getId());
         return monitorOptional.get();
     }
 
@@ -58,6 +71,7 @@ public class MonitorService {
         Monitor monitor = checkValuesForCorrectness(addMonitorDTO, new Monitor());
 
         Monitor addedMonitor = monitorRepository.save(monitor);
+        log.info("Монитор с id [{}] добавлен", addedMonitor.getId());
         return addedMonitor.getId();
 
     }
@@ -66,18 +80,20 @@ public class MonitorService {
 
         Optional<Monitor> monitorOptional = monitorRepository.findById(updateMonitorDTO.getId());
         if (monitorOptional.isEmpty()){
+            log.info("Не найден монитор по id [{}]", updateMonitorDTO.getId());
             throw new EmptyDataException("Не найден монитор по id = " + updateMonitorDTO.getId());
         }
 
         Monitor updatedMonitor = checkValuesForCorrectness(updateMonitorDTO, monitorOptional.get());
         monitorRepository.save(updatedMonitor);
-
+        log.info("Монитор с id [{}] обновлен", updatedMonitor.getId());
         return new MonitorResponseDTO(updatedMonitor) ;
     }
 
 
     public void deleteMonitorById(long id) {
         monitorRepository.deleteById(id);
+        log.info("Монитор с id [{}] удален", id);
     }
 
 

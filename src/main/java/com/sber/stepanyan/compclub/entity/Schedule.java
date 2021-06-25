@@ -8,9 +8,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
+@Table(name = "scheduless")
 public class Schedule {
 
     @Id
@@ -20,9 +22,9 @@ public class Schedule {
     @ManyToOne
     @JoinColumn(name = "workstation_id")
     private Workstation workstation;
-    @Column(name = "start")
+    @Column(name = "starto")
     private Timestamp start;
-    @Column(name = "end")
+    @Column(name = "endo")
     private Timestamp end;
     @OneToOne(mappedBy = "schedule")
     private Order order;
@@ -30,10 +32,11 @@ public class Schedule {
     public Schedule() {
     }
 
-    public Schedule(Workstation workstation, Timestamp start, Timestamp end) {
+    public Schedule(Workstation workstation, Long start, Long end) {
         this.workstation = workstation;
-        this.start = start;
-        this.end = end;
+        this.start = new Timestamp(start*1000);
+        this.end = new Timestamp(end*1000);
+
     }
 
     public Long getId() {

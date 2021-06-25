@@ -22,17 +22,8 @@ public class ComputerClub {
     @Column(name = "name", unique = true)
     private String name;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "computerClub")
-    @Column(name = "workstations")
     private Set<Workstation> workstations;
 
-
-    public void addWorkstationToComputerClub(Workstation workstation){
-        if (workstations == null){
-            workstations = new HashSet<>();
-        }
-        workstations.add(workstation);
-        workstation.setComputerClub(this);
-    }//вывести в сервис
 
     public ComputerClub() {
     }

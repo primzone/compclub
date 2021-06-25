@@ -3,6 +3,7 @@ package com.sber.stepanyan.compclub.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,23 +23,21 @@ public class Workstation {
 //    @GenericGenerator(name="kaugen" , strategy="increment")
 //    @GeneratedValue(generator="kaugen")
     private Integer workstationNumber;
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "computerClub_id")
     private ComputerClub computerClub;
 
-    @OneToMany(mappedBy = "workstation")
-    @Column(name = "schedules")
+    @OneToMany(mappedBy = "workstation", fetch = FetchType.EAGER)
     private Set<Schedule> schedules;
 
-    @OneToMany(mappedBy = "workstation")
-    @Column(name = "orders")
+    @OneToMany(mappedBy = "workstation", fetch = FetchType.EAGER)
     private Set<Order> orders;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "monitor_id")
     private Monitor monitor;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinColumn(name = "systemUnit_id")
     private SystemUnit systemUnit;
 

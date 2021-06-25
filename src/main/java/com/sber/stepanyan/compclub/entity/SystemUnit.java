@@ -13,6 +13,7 @@ import java.util.Set;
 
 @Entity
 public class SystemUnit {
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     @Column(name = "id")
@@ -23,13 +24,9 @@ public class SystemUnit {
     private String craphicsCard;
     @Column(name = "ram", nullable = false)
     private Integer ram;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "power", nullable = false)
-    private SystemUnitPower power;
     @Column(name = "pricePerHour", nullable = false)
     private Double pricePerHour;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "systemUnit")
-    @Column(name = "workstations")
     private Set<Workstation> workstations;
 
     public SystemUnit() {
@@ -67,13 +64,6 @@ public class SystemUnit {
         this.ram = ram;
     }
 
-    public SystemUnitPower getPower() {
-        return power;
-    }
-
-    public void setPower(SystemUnitPower power) {
-        this.power = power;
-    }
 
     public Double getPricePerHour() {
         return pricePerHour;

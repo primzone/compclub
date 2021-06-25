@@ -10,19 +10,21 @@ public class ScheduleService {
 
     final ScheduleRepository scheduleRepository;
 
+
+
     public ScheduleService(ScheduleRepository scheduleRepository) {
         this.scheduleRepository = scheduleRepository;
     }
 
     public void checkSchedules(Schedule schedule, Schedule s) {
 
-        if (s.getStart().getTime() > schedule.getStart().getTime() &&
-                schedule.getStart().getTime() < s.getEnd().getTime()){
+        if ((schedule.getStart().getTime()+1) > s.getStart().getTime() &&
+                (schedule.getStart().getTime()+1) < s.getEnd().getTime()){
             throw new InvalidValuesException("Это время уже занято");
         }
 
-        if (s.getStart().getTime() > schedule.getEnd().getTime() &&
-                schedule.getEnd().getTime() < s.getEnd().getTime()){
+        if ((schedule.getEnd().getTime()-1)  > s.getStart().getTime() &&
+                (schedule.getEnd().getTime()-1) < s.getEnd().getTime()){
             throw new InvalidValuesException("Это время уже занято");
         }
 

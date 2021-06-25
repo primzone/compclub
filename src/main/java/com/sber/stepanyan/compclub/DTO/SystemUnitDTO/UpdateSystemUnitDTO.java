@@ -21,7 +21,6 @@ public class UpdateSystemUnitDTO {
     @Min(value = 2, message = "минимальный ram = 2")
     @Max(value = 256, message = "максимальный ram = 256")
     private Integer ram;
-    private SystemUnitPower power;
     @Min(value = 100, message = "минимальный pricePerHour = 100")
     @Max(value = 500, message = "максимальный pricePerHour = 500")
     private Double pricePerHour;
@@ -34,16 +33,14 @@ public class UpdateSystemUnitDTO {
         this.cpu = systemUnit.getCpu();
         this.craphicsCard = systemUnit.getCraphicsCard();
         this.ram = systemUnit.getRam();
-        this.power = systemUnit.getPower();
         this.pricePerHour = systemUnit.getPricePerHour();
     }
 
-    public UpdateSystemUnitDTO(Long id, String cpu, String craphicsCard, Integer ram, SystemUnitPower power, Double pricePerHour) {
+    public UpdateSystemUnitDTO(Long id, String cpu, String craphicsCard, Integer ram, Double pricePerHour) {
         this.id = id;
         this.cpu = cpu;
         this.craphicsCard = craphicsCard;
         this.ram = ram;
-        this.power = power;
         this.pricePerHour = pricePerHour;
     }
 
@@ -77,14 +74,6 @@ public class UpdateSystemUnitDTO {
 
     public void setRam(Integer ram) {
         this.ram = ram;
-    }
-
-    public SystemUnitPower getPower() {
-        return power;
-    }
-
-    public void setPower(SystemUnitPower power) {
-        this.power = power;
     }
 
     public Double getPricePerHour() {

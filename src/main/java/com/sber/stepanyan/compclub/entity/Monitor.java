@@ -28,7 +28,6 @@ public class Monitor {
     @Column(name = "pricePerHour", nullable = false)
     private Double pricePerHour;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "monitor")
-    @Column(name = "workstations")
     private Set<Workstation> workstations;
 
 
