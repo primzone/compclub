@@ -73,7 +73,7 @@ public class KafkaProducerService {
 
     public void produce(AccountResponseDTO accountResponseDTO) {
         log.info("Producing to kafka the accountResponseDTO " + accountResponseDTO);
-        accountResponseDTOKafkaTemplate.send(WORKSTATION_TOPIC, accountResponseDTO);
+        accountResponseDTOKafkaTemplate.send(ACCOUNT_TOPIC, accountResponseDTO);
     }
 
 

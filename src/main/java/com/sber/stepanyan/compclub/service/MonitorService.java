@@ -8,6 +8,8 @@ import com.sber.stepanyan.compclub.exception_handling.EmptyDataException;
 import com.sber.stepanyan.compclub.exception_handling.InvalidValuesException;
 import com.sber.stepanyan.compclub.kafka.KafkaProducerService;
 import com.sber.stepanyan.compclub.repository.MonitorRepository;
+import io.micrometer.core.annotation.Counted;
+import io.micrometer.core.annotation.Timed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,8 @@ public class MonitorService {
     }
 
 
+    @Counted(value = "counted.get.monitors", description = "Счетчик получений всех мониторов")
+    @Timed(value = "timed.get.monitors", description = "Время на получение всех мониторов")
     public List<MonitorResponseDTO> getAllMonitors() {
 
         List<Monitor> monitorList = monitorRepository.findAll();
@@ -48,7 +52,8 @@ public class MonitorService {
         return monitorResponseDTOList;
     }
 
-
+    @Counted(value = "counted.get.monitor", description = "Счетчик получений мониторов по id")
+    @Timed(value = "timed.get.monitor", description = "Время на получение монитора")
     public MonitorResponseDTO getMonitorById(Long id) {
 
         log.info("Вернуть монитор с id [{}]", id);
@@ -66,16 +71,21 @@ public class MonitorService {
         return monitorOptional.get();
     }
 
+    @Counted(value = "counted.add.monitor", description = "Счетчик добавлений мониторов")
+    @Timed(value = "timed.add.monitor", description = "Время на добавление монитора")
     public long addMonitor(AddMonitorDTO addMonitorDTO) {
 
         Monitor monitor = checkValuesForCorrectness(addMonitorDTO, new Monitor());
 
         Monitor addedMonitor = monitorRepository.save(monitor);
         log.info("Монитор с id [{}] добавлен", addedMonitor.getId());
+        kafkaProducerService.produce(new MonitorResponseDTO(monitor));
         return addedMonitor.getId();
 
     }
 
+    @Counted(value = "counted.update.monitor", description = "Счетчик изменений мониторов")
+    @Timed(value = "timed.update.monitor", description = "Время на изменение монитора")
     public MonitorResponseDTO updateMonitor(UpdateMonitorDTO updateMonitorDTO) {
 
         Optional<Monitor> monitorOptional = monitorRepository.findById(updateMonitorDTO.getId());
@@ -87,10 +97,12 @@ public class MonitorService {
         Monitor updatedMonitor = checkValuesForCorrectness(updateMonitorDTO, monitorOptional.get());
         monitorRepository.save(updatedMonitor);
         log.info("Монитор с id [{}] обновлен", updatedMonitor.getId());
+        kafkaProducerService.produce(new MonitorResponseDTO(updatedMonitor));
         return new MonitorResponseDTO(updatedMonitor) ;
     }
 
-
+    @Counted(value = "counted.delete.monitor", description = "Счетчик удаланий мониторов")
+    @Timed(value = "timed.delete.monitor", description = "Время на удаление монитора")
     public void deleteMonitorById(long id) {
         monitorRepository.deleteById(id);
         log.info("Монитор с id [{}] удален", id);
