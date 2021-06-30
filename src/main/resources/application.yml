@@ -1,0 +1,58 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:compclub_db
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+
+
+  kafka:
+    producer:
+      bootstrap-servers: 10.53.222.63:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+logging:
+  file:
+    name: compclub.log
+
+server:
+  port: 8080
+
+management:
+  server:
+    port: 8081
+
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: always
+  # Включить экспорт prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    enable:
+      jvm: true
+
+
+info:
+  application:
+    name: compclub
+    description: CRM for Computer clubs
+    version: 0.0.1-SNAPSHOT
+  techstack:
+    java: open jdk 8
+    spring boot: 2.5.1
+    database: H2
