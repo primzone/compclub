@@ -120,15 +120,13 @@
                             <allowInsecureRegistries>true</allowInsecureRegistries>
 
                             <from>
-
                                 <!-- ссылка на образ с которого формируем собственный -->
                                 <image>${base.image}</image>
-                                <auth>
-                                    <!-- логин и пароль не меняются -->
-                                    <username>nexus.user</username>
-                                    <password>nexus.password</password>
-                                </auth>
-
+<!--                                <auth>-->
+<!--                                    &lt;!&ndash; логин и пароль не меняются &ndash;&gt;-->
+<!--                                    <username>nexus.user</username>-->
+<!--                                    <password>nexus.password</password>-->
+<!--                                </auth>-->
                             </from>
                             <!-- Формирование контейнера, где можно выбрать способ с mainСlass
                             - основной класс приложения или папки/файла appRoot -->
@@ -136,22 +134,21 @@
                                 <format>Docker</format>
                                 <!-- <ports>8080</ports> -->
                                 <mainClass>com.sber.stepanyan.compclub.CompclubApplication</mainClass>
-                                <!--                                 <appRoot>/target/${project.artifactId}-${project.version}.jar</appRoot>-->
+<!--                                                                 <appRoot>/target/${project.artifactId}-${project.version}.jar</appRoot>-->
                                 <ports>8080</ports>
 
-                                <jvmFlags>
-
-                                    -Dspring.config.location=file:/deployments/config/application.yml,file:/deployments/config/ssl/ssl.yml,file:/deployments/config/secret/esb-config.yml,file:/deployments/config/secret/ups-config.yml
-                                </jvmFlags>
+<!--                                <jvmFlags>-->
+<!--                                    -Dspring.config.location=file:/deployments/config/application.yml,file:/deployments/config/ssl/ssl.yml,file:/deployments/config/secret/esb-config.yml,file:/deployments/config/secret/ups-config.yml-->
+<!--                                </jvmFlags>-->
                             </container>
                             <to>
                                 <!-- репозиторий куда деплоить контейнер и именем проекта -->
                                 <image>${deploy.path}${project.artifactId}</image>
-                                <auth>
-                                    <!-- логин и пароль не меняются -->
-                                    <username>nexus.user</username>
-                                    <password>nexus.password</password>
-                                </auth>
+<!--                                <auth>-->
+<!--                                    &lt;!&ndash; логин и пароль не меняются &ndash;&gt;-->
+<!--                                    <username>nexus.user</username>-->
+<!--                                    <password>nexus.password</password>-->
+<!--                                </auth>-->
                                 <!-- не изменяется, проставляет версию и тэг для образа -->
                                 <tags>
                                     <tag>v1</tag>

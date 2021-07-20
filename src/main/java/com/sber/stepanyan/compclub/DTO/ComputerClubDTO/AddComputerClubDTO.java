@@ -15,6 +15,18 @@ public class AddComputerClubDTO {
     @NotBlank(message = "address не должен быть пустым")
     private String address;
 
+
+
+
+
+
+
+
+
+
+
+
+
     @Size(min = 3, max = 30, message = "name должен быть от 3 до 30 символов")
     @NotBlank(message = "name не должен быть пустым")
     private String name;
